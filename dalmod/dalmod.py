@@ -3,8 +3,8 @@ import pdb
 import struct
 
 def main():
-	if len(sys.argv) < 2:
-		print 'Usage: %s BigDAL.prc' % sys.argv[0]
+	if len(sys.argv) < 3:
+		print 'Usage: %s BigDAL.prc bootmenu.bin' % sys.argv[0]
 		sys.exit(1)
 	
 	prc = pdb.Pdb()
@@ -12,19 +12,43 @@ def main():
 
 	boot = find_boot(prc)
 	
-	if boot.data[3] != '\xea':
-		print 'Initial branch not found', repr(boot.data[:4])
+	dal_start = unpack_branch(boot.data)
+	print 'Palm OS start offset:', hex(dal_start)
+
+	bm_start = len(boot.data)
+	print 'Boot menu start offset:', hex(bm_start)
+
+	bootmenu = file(sys.argv[2], 'rb').read()
+	if struct.unpack('<I', bootmenu[4:8])[0] != 0xb007c0de:
+		print 'Magic number missing.'
+		print 'Are you sure this is bootmenu?'
+		sys.exit(5)
+
+	# insert dal_start address into bootmenu
+	bootmenu = bootmenu[:8] + pack_branch(dal_start-bm_start-8) + bootmenu[12:]
+
+	# now write bootmenu into DAL
+	boot.data = pack_branch(bm_start) + boot.data[4:] + bootmenu
+
+	prc.write(file('BigDAL-bm.prc','w'))
+	
+
+
+def unpack_branch(data):
+	if data[3] != '\xea':
+		print 'Initial branch not found', repr(data[:4])
 		print 'Are you sure this is BigDAL?'
 		sys.exit(4)
 
 	# unpack the signed 24-bit branch offset
-	if ord(boot.data[2]) & 0x80:
+	if ord(data[2]) & 0x80:
 		pad = '\xff' # negative
 	else:
 		pad = '\0' # positive
-	palmosstart, = struct.unpack('<i', boot.data[:3] + pad)
-	palmosstart = (palmosstart << 2) + 8
-	print 'Palm OS start offset:', hex(palmosstart)
+	return (struct.unpack('<i', data[:3] + pad)[0] << 2) + 8
+
+def pack_branch(offset):
+	return struct.pack('<i', (offset-8)>>2)[:3] + '\xea'
 
 
 def find_boot(prc):
