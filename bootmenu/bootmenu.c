@@ -1,4 +1,5 @@
 #include "palmld-gpio.h"
+#include "bootmenu.h"
 
 /*
  * Handy function to set GPIO alternate functions
@@ -30,5 +31,8 @@ int main()
 {
 	pxa_gpio_mode(GPIO_NR_PALMLD_GREEN_LED_MD);
 	SET_PALMLD_GPIO(GREEN_LED, 1);
+
+	init_video();
+	make_it_pink();
 	while (1);
 }
