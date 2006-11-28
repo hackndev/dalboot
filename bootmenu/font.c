@@ -11,7 +11,7 @@
 const unsigned char fontdata_8x16[FONTDATAMAX] = {
 
 	/* 0 0x00 '^@' */
-	0x00, /* 00000000 */
+	0x70, /* 00000000 */
 	0x00, /* 00000000 */
 	0x00, /* 00000000 */
 	0x00, /* 00000000 */
@@ -4619,6 +4619,58 @@ const unsigned char fontdata_8x16[FONTDATAMAX] = {
 	0x00, /* 00000000 */
 
 };
+
+#include "pxa-regs.h"
+#include "bootmenu.h"
+
+extern const unsigned char fontdata_8x16[];
+
+#define RGB16(r,g,b) ((r<<11)+(g<<5)+b)
+#define FONT_ROWS 16
+#define FONT_COLS 8
+
+static u16 *framebuffer;
+static u32 width, height, bpp;
+static u32 cursorx, cursory;
+
+void init_video()
+{
+	framebuffer = *(u16**)(FDADR0 + 4);
+	width = (LCCR1 & 0x3ff) + 1;
+	height = (LCCR2 & 0x3ff) + 1;
+	bpp = 16;
+}
+
+
+void draw_char(unsigned int c, u32 x, u32 y)
+{
+	u32 row, col;
+	for (row=0; row < FONT_ROWS; row++) {
+	for (col=0; col < FONT_COLS; col++) {
+		if ((fontdata_8x16[(FONT_ROWS*c)+row] & (1<<(7-col))) ) {
+			framebuffer[(row+y)*width+col+x] = 0xff00;
+		} else {
+			framebuffer[(row+y)*width+col+x] = 0x0;
+		}
+	}
+	}
+}
+
+void make_it_pink()
+{
+	u32 len = width * height * bpp / 8/4;
+	u16 *p;
+	
+	for (p=framebuffer; p < framebuffer+len; p++) {
+		if (fontdata_8x16[0] != 0x70) {
+			*p =  RGB16(15,0,0); // red screen of death
+		} else {
+			*p = RGB16(5,5,15);
+		}
+	}
+
+	draw_char('A',0,0);
+}
 
 
 #if 0

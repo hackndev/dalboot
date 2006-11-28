@@ -1,12 +1,16 @@
+#if 0
 #include "pxa-regs.h"
 #include "bootmenu.h"
 
 extern const unsigned char fontdata_8x16[];
 
 #define RGB16(r,g,b) ((r<<11)+(g<<5)+b)
+#define FONT_ROWS 16
+#define FONT_COLS 8
 
 static u16 *framebuffer;
 static u32 width, height, bpp;
+static u32 cursorx, cursory;
 
 void init_video()
 {
@@ -16,14 +20,4 @@ void init_video()
 	bpp = 16;
 }
 
-void make_it_pink()
-{
-	u32 len = width * height * bpp / 8/4;
-	u16 *p;
-	
-	for (p=framebuffer; p < framebuffer+len; p++) {
-		*p = RGB16(5,5,15);
-	}
-}
-
-
+#endif
