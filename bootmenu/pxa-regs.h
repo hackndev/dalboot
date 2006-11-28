@@ -13,7 +13,12 @@
 #ifndef __PXA_REGS_H
 #define __PXA_REGS_H
 
-#include <linux/config.h>
+
+#ifdef __ASSEMBLY__
+#define __REG(x)	x
+#else
+#define __REG(x)	(*((volatile unsigned long *)(x)))
+#endif
 
 /*
  * PXA Chip selects
