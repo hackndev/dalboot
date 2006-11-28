@@ -1,7 +1,7 @@
 CROSS_COMPILE?=arm-softfloat-linux-gnu-
 CC=${CROSS_COMPILE}gcc
 OBJCOPY=${CROSS_COMPILE}objcopy
-LDFLAGS=-nostdlib -fPIC
+LDFLAGS=-nostdlib -fPIC -Wall
 
 SRCS=start.S bootmenu.c
 

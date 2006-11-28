@@ -16,8 +16,11 @@
 
 #ifdef __ASSEMBLY__
 #define __REG(x)	x
+#define __REG2(x,y)	__REG(x)+y
 #else
-#define __REG(x)	(*((volatile unsigned long *)(x)))
+#define __REG(x)	(*((volatile unsigned long *)x))
+#define __REG2(x,y)    \
+		(*(volatile unsigned long *)((unsigned long)&__REG(x) + (y)))
 #endif
 
 /*
