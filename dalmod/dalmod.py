@@ -1,5 +1,6 @@
 import sys
 import pdb
+import struct
 
 def main():
 	if len(sys.argv) < 2:
@@ -10,7 +11,21 @@ def main():
 	prc.read(file(sys.argv[1], 'rb'))
 
 	boot = find_boot(prc)
-	print repr(boot.data[:4])
+	
+	if boot.data[3] != '\xea':
+		print 'Initial branch not found', repr(boot.data[:4])
+		print 'Are you sure this is BigDAL?'
+		sys.exit(4)
+
+	# unpack the signed 24-bit branch offset
+	if ord(boot.data[2]) & 0x80:
+		pad = '\xff' # negative
+	else:
+		pad = '\0' # positive
+	palmosstart, = struct.unpack('<i', boot.data[:3] + pad)
+	palmosstart = (palmosstart << 2) + 8
+	print 'Palm OS start offset:', hex(palmosstart)
+
 
 def find_boot(prc):
 	boots = [x for x in prc.resources if x.type == 'boot']
