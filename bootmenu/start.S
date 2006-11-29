@@ -12,3 +12,9 @@ dal_start:
 _start:
 	bl	main
 	b	dal_start
+
+.globl get_cpu_id
+@ This ID can be used to determine the manufacturer and model of the CPU.
+get_cpu_id:
+	mrc p15, 0, r0, c0, c0, 0
+	mov	pc, lr
