@@ -5,7 +5,6 @@ extern const unsigned char fontdata_8x16[];
 unsigned char font_entry(u32 entry);
 
 #define PIXEL(x,y) framebuffer[(x)+width*(y)]
-#define RGB16(r,g,b) ((r<<11)+(g<<5)+b)
 #define FONT_ROWS 16
 #define FONT_COLS 8
 
@@ -15,6 +14,7 @@ static u32 cursorx, cursory;
 
 void init_video()
 {
+	cursorx=cursory=0;
 	if (cpu_is_pxa() && FDADR0) {
 		framebuffer = *(u16**)(FDADR0 + 4);
 		width = (LCCR1 & 0x3ff) + 1;
@@ -41,38 +41,67 @@ void draw_char(unsigned int c, u32 x, u32 y)
 	}
 }
 
+int putc(const char c)
+{
+	switch (c) {
+	case '\0':
+		return 1;
+	case '\n':
+		cursory++;
+	case '\r':
+		cursorx=0;
+		break;
+	case '\t':
+		cursorx+=8;
+		break;
+	case '\b':
+		cursorx--;
+		break;
+	default:
+		draw_char(c, cursorx*FONT_COLS, cursory*FONT_ROWS);
+		cursorx++;
+	}
+	
+	/* TODO: better overflow handling */
+	if (cursorx*FONT_COLS > width) {
+		cursorx=0;
+		cursory++;
+	}
+	if (cursory*FONT_ROWS > height) {
+		cursory=0;
+	}
+	return 1;
+}
+
 int puts(const char *s)
 {
-	while(1) {
-		switch (*s) {
-		case '\0':
-			return 1;
-		case '\n':
-			cursory++;
-		case '\r':
-			cursorx=0;
-			break;
-		case '\t':
-			cursorx+=8;
-			break;
-		case '\b':
-			cursorx--;
-			break;
-		default:
-			draw_char(*s, cursorx*FONT_COLS, cursory*FONT_ROWS);
-			cursorx++;
-		}
-		
-		/* TODO: better overflow handling */
-		if (cursorx*FONT_COLS > width) {
-			cursorx=0;
-			cursory++;
-		}
-		if (cursory*FONT_ROWS > height) {
-			cursory=0;
-		}
+	while(*s) {
+		putc(*s);	
 		s++;
 	}
+	return 1;
+}
+
+void put_pc()
+{
+	u32 pc;
+	asm("test:mov %0, pc" : "=r"(pc));
+	while (pc) {
+		putc('0' + (pc%10));
+		pc /= 10;
+	}
+}
+
+void fill_screen(u16 color)
+{
+	u32 len = width * height * bpp / 8 /2;
+	u32 i;
+	if (!framebuffer) return;
+	
+	for (i=0; i < len; i++)
+		framebuffer[i] = color;
+
+	cursorx = cursory = 0;
 }
 
 void make_it_pink()
@@ -90,5 +119,9 @@ void make_it_pink()
 	}
 
 	//draw_char('A',0,0);
-	puts("Hello Hack&Dev\nFrom Alex\n");
+	put_pc();
+	putc('\n');
+	putc('A'); putc('l'); putc('e'); putc('x');
+	putc('\n'); putc('H'); putc('&'); putc('D');
+	puts("\nHello");
 }

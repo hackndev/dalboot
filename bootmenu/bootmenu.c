@@ -33,6 +33,43 @@ int main()
 	SET_PALMLD_GPIO(GREEN_LED, 1);
 
 	init_video();
-	make_it_pink();
+	fill_screen(RGB16(5,5,5));
+	puts("Bootmenu v0.1\nBy Alex Osborne\n\n");
+
+	u32 cpu = get_cpu();
+	puts("[CPU] ");
+	puts(get_cpu_vendor(cpu));
+	puts(" ");
+	puts(get_cpu_name(cpu));
+	puts("\n");
+	
 	while (1);
+	return 0;
+}
+
+/**
+ * Needed by libgcc for div by zero errors etc.
+ */
+int raise(int sig)
+{
+	puts("libgcc error. div by zero?\n");
+	while(1);
+}
+
+/**
+ * Copy bootmenu from wherever it currently is to the
+ * _start location defined by the linker.
+ *
+ * start.S will pass in the current address we're located
+ * at and expects the final address of the main function
+ * in return.
+ */
+extern u32 _start;
+extern u32 _end;
+void *relocate_bootmenu(u32 *src)
+{
+	u32 *dest=&_start;
+	while (dest < &_end)
+		*(dest++) = *(src++);
+	return &main;
 }
