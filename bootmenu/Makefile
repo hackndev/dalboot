@@ -3,7 +3,7 @@ CC=${CROSS_COMPILE}gcc
 OBJCOPY=${CROSS_COMPILE}objcopy
 LDFLAGS=-nostdlib -Wall -pipe -Tbootmenu.lds -O
 
-SRCS=start.S bootmenu.c font.S video.c mach.c vsprintf.c string.c ctype.c
+SRCS=start.S bootmenu.c font.S video.c mach.c vsprintf.c string.c ctype.c div64.S
 LIBGCC=-lgcc
 
 all: BigDAL-pm.prc

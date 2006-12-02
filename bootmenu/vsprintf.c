@@ -18,6 +18,7 @@
 #include "stddef.h"
 #include "ctype.h"
 #include "string.h"
+#include "div64.h"
 #include <stdarg.h>
 
 #define PAGE_SIZE 4096
@@ -171,7 +172,7 @@ static char * number(char * buf, char * end, unsigned long long num, int base, i
 	if (num == 0)
 		tmp[i++]='0';
 	else while (num != 0)
-		tmp[i++] = digits[/*do_div(num,base)*/ num/base];
+		tmp[i++] = digits[do_div(num,base)];
 	if (i > precision)
 		precision = i;
 	size -= precision;
