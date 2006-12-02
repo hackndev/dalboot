@@ -1,9 +1,9 @@
 CROSS_COMPILE?=arm-softfloat-linux-gnu-
 CC=${CROSS_COMPILE}gcc
 OBJCOPY=${CROSS_COMPILE}objcopy
-LDFLAGS=-nostdlib -Wall -pipe -Tbootmenu.lds
+LDFLAGS=-nostdlib -Wall -pipe -Tbootmenu.lds -O
 
-SRCS=start.S bootmenu.c font.S video.c mach.c
+SRCS=start.S bootmenu.c font.S video.c mach.c vsprintf.c string.c ctype.c
 LIBGCC=-lgcc
 
 all: BigDAL-pm.prc

@@ -1,5 +1,7 @@
+#include <stdarg.h>
 #include "pxa-regs.h"
 #include "bootmenu.h"
+#include "vsprintf.h"
 
 extern const unsigned char fontdata_8x16[];
 unsigned char font_entry(u32 entry);
@@ -80,6 +82,19 @@ int puts(const char *s)
 		s++;
 	}
 	return 1;
+}
+
+int printf(const char *fmt, ...)
+{
+	char buf[256];
+	va_list args;
+	int i;
+
+	va_start(args, fmt);
+	i=vsnprintf(buf,256,fmt,args);
+	va_end(args);
+	puts(buf);
+	return i;
 }
 
 void put_pc()

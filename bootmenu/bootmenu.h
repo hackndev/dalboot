@@ -1,12 +1,11 @@
-#define NULL ((void*)0)
-typedef unsigned long u32;
-typedef unsigned short u16;
 
+#include "stddef.h"
 /* video.c */
 void fill_screen(u16 color);
 void init_video();
 int putc(const char c);
 int puts(const char *s);
+int printf(const char *fmt, ...);
 #define RGB16(r,g,b) ((r<<11)+(g<<5)+b)
 
 /* start.S */

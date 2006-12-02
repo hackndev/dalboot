@@ -42,8 +42,9 @@ int main()
 	puts(" ");
 	puts(get_cpu_name(cpu));
 	puts("\n");
+	printf("test %d\n", 123);
 	
-	while (1);
+	//while (1);
 	return 0;
 }
 
