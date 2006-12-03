@@ -43,7 +43,7 @@ void draw_char(unsigned int c, u32 x, u32 y)
 	}
 }
 
-int putc(const char c)
+int putchar(int c)
 {
 	switch (c) {
 	case '\0':
@@ -78,7 +78,7 @@ int putc(const char c)
 int puts(const char *s)
 {
 	while(*s) {
-		putc(*s);	
+		putchar(*s);	
 		s++;
 	}
 	return 1;
@@ -102,7 +102,7 @@ void put_pc()
 	u32 pc;
 	asm("test:mov %0, pc" : "=r"(pc));
 	while (pc) {
-		putc('0' + (pc%10));
+		putchar('0' + (pc%10));
 		pc /= 10;
 	}
 }
@@ -133,10 +133,5 @@ void make_it_pink()
 		}
 	}
 
-	//draw_char('A',0,0);
 	put_pc();
-	putc('\n');
-	putc('A'); putc('l'); putc('e'); putc('x');
-	putc('\n'); putc('H'); putc('&'); putc('D');
-	puts("\nHello");
 }

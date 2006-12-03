@@ -29,6 +29,7 @@ void pxa_gpio_mode(int gpio_mode)
 
 int main()
 {
+	u32 machcode[2] = {0,0};
 	pxa_gpio_mode(GPIO_NR_PALMLD_GREEN_LED_MD);
 	SET_PALMLD_GPIO(GREEN_LED, 1);
 
@@ -37,15 +38,21 @@ int main()
 	puts("Bootmenu v0.1\nBy Alex Osborne\n\n");
 
 	u32 cpu = get_cpu();
-	puts("[CPU] ");
-	puts(get_cpu_vendor(cpu));
-	puts(" ");
-	puts(get_cpu_name(cpu));
-	puts("\n");
-	printf("test %d %s\n", 123, "foo!");
-	puts("hello2\n");
+	printf("[CPU] %s %s\n", get_cpu_vendor(cpu), get_cpu_name(cpu));
+
+	machcode[0] = get_rom_mach();
+	printf("[MACH] %s\n", (char*)machcode);
+
+	init_keypad();
 	
-	while (1);
+	int k;
+	while (1) {
+		k = getchar();
+		if (k) putchar(k);
+		switch (k) {
+		case 'h': return 0; /* home: boot palmos */
+		}
+	}
 	return 0;
 }
 

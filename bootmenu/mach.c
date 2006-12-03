@@ -102,3 +102,17 @@ int cpu_is_pxa()
 	return cpu == CPU_PXA25X || cpu == CPU_PXA27X || cpu == CPU_PXA210;
 }
 
+/*
+ * What appears to be a machine code is stored in the IPL in the boot ROM at 
+ * address 0x58. This may only be on the newer handhelds - T|T5 and later.
+ * 
+ * List of codes:
+ * 	ANGS - Tungeten T5 (Angus)
+ * 	BRMA - LifeDrive (Brahma)
+ *
+ */
+u32 get_rom_mach()
+{
+	u32 *rom_mach_code = (u32*)0x58;
+	return *rom_mach_code;
+}

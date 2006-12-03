@@ -13,6 +13,7 @@
 #ifndef __PXA_REGS_H
 #define __PXA_REGS_H
 
+#define CONFIG_PXA27x
 
 #ifdef __ASSEMBLY__
 #define __REG(x)	x
@@ -22,6 +23,17 @@
 #define __REG2(x,y)    \
 		(*(volatile unsigned long *)((unsigned long)&__REG(x) + (y)))
 #endif
+
+#define GET_GPIO(gpio) \
+        (GPLR(gpio) & GPIO_bit(gpio))
+
+#define SET_GPIO(gpio, setp) \
+do { \
+if (setp) \
+        GPSR(gpio) = GPIO_bit(gpio); \
+else \
+        GPCR(gpio) = GPIO_bit(gpio); \
+} while (0)
 
 /*
  * PXA Chip selects
