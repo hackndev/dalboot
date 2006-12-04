@@ -65,11 +65,11 @@ int putchar(int c)
 	}
 	
 	/* TODO: better overflow handling */
-	if (cursorx*FONT_COLS > width) {
+	if (cursorx*FONT_COLS >= width) {
 		cursorx=0;
 		cursory++;
 	}
-	if (cursory*FONT_ROWS > height) {
+	if (cursory*FONT_ROWS >= height) {
 		cursory=0;
 	}
 	return 1;

@@ -1,61 +1,15 @@
 #include "bootmenu.h"
 #include "pxa-regs.h"
-#include "palmld-gpio.h"
 
 #define DEBOUNCE_INTERVAL	32 /* ms */
-typedef struct keypad_matrix {
-	int rows, cols;
-	int pxa27x; /* use the pxa27x keypad controller? */
-	int in_gpios[8], out_gpios[8];
-	int keymap[8][8];
-} keypad_matrix;
 
-keypad_matrix palmld_keypad = {
-	.rows = 4,
-	.cols = 3,
-	.pxa27x = true,
-	.in_gpios = {
-		GPIO_NR_PALMLD_KP_MKIN0_MD,
-		GPIO_NR_PALMLD_KP_MKIN1_MD,
-		GPIO_NR_PALMLD_KP_MKIN2_MD,
-		GPIO_NR_PALMLD_KP_MKIN3_MD,
-		-1,
-	},
-	.out_gpios = {
-		GPIO_NR_PALMLD_KP_MKOUT0_MD,
-		GPIO_NR_PALMLD_KP_MKOUT1_MD,
-		GPIO_NR_PALMLD_KP_MKOUT2_MD,
-		-1,
-	},
-	.keymap = {
-		{
-			-1,
-			'f',	/* folder */
-			'u',	/* up */
-		},
-		{
-			'p',	/* picture */
-			's',	/* star */
-			'r',	/* right */
-		},
-		{
-			'h',	/* home */
-			'v',	/* voice memo */
-			'd',	/* down */
-		},
-		{
-			'r',	/* rotate */
-			'c',	/* centre */
-			'l',	/* left */
-		},
-	}
-};
+keypad_matrix *kp;
 
-keypad_matrix *kp = &palmld_keypad;
-
-void init_keypad()
+void init_keypad(keypad_matrix *keypad)
 {
 	int i;
+
+	kp = keypad;
 
 	for (i=0; kp->out_gpios[i] >= 0; i++) {
 		pxa_gpio_mode(kp->out_gpios[i]);
@@ -78,6 +32,7 @@ void init_keypad()
 int read_keypad()
 {	
 	int col, row;
+	if (!kp) return 0;
 
 	if (kp->pxa27x) {
 		KPC |= KPC_AS; /* initiate scan */

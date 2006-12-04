@@ -4,6 +4,7 @@
 typedef unsigned long u32;
 typedef unsigned short u16;
 typedef unsigned long size_t;
+typedef unsigned char u8;
 
 #undef NULL
 #if defined(__cplusplus)

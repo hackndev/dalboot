@@ -27,7 +27,6 @@
 #define CPU_946E 0x41000946
 #define CPU_1020E 0x41000A22
 
-
 const char *get_cpu_vendor(u32 cpu)
 {
 	switch (cpu & CPU_VENDOR_MASK) {
@@ -107,12 +106,35 @@ int cpu_is_pxa()
  * address 0x58. This may only be on the newer handhelds - T|T5 and later.
  * 
  * List of codes:
+ * 	aAz1 - Tungsten T3 (Arizona)
  * 	ANGS - Tungeten T5 (Angus)
  * 	BRMA - LifeDrive (Brahma)
  *
  */
+#define NEW_MACH_OFFSET 0x58
+#define OLD_MACH_OFFSET 0x84
 u32 get_rom_mach()
 {
-	u32 *rom_mach_code = (u32*)0x58;
-	return *rom_mach_code;
+	u32 code = *(u32*) NEW_MACH_OFFSET;
+	/* smallrom in RAM-based devices has the mach code at 0x84, so if we have 
+	 * weird characters in our code, use the other offset.
+	 */
+	while (code) {
+		if ((code & 0xff) < ' ' || (code & 0xff) > '~') {
+			code = *(u32*) OLD_MACH_OFFSET;
+			break;
+		}
+		code >>= 8;
+	}
+	return code;
+}
+
+void init_mach()
+{
+	u32 mach = get_rom_mach();
+
+	switch (mach) {
+	//case PALMT3: init_palmt3(); break;
+	case PALMLD: init_palmld(); break;
+	}
 }

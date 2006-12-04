@@ -40,10 +40,11 @@ int main()
 	u32 cpu = get_cpu();
 	printf("[CPU] %s %s\n", get_cpu_vendor(cpu), get_cpu_name(cpu));
 
-	machcode[0] = get_rom_mach();
-	printf("[MACH] %s\n", (char*)machcode);
+	//machcode[0] = get_rom_mach();
+	//printf("[MACH] %s\n", (char*)machcode);
 
-	init_keypad();
+	init_palmld();
+	init_palmcard();
 	
 	int k;
 	while (1) {
