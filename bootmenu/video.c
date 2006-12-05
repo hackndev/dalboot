@@ -1,5 +1,6 @@
 #include <stdarg.h>
 #include "pxa-regs.h"
+#include "palmld-gpio.h"
 #include "bootmenu.h"
 #include "vsprintf.h"
 
@@ -9,6 +10,8 @@ unsigned char font_entry(u32 entry);
 #define PIXEL(x,y) framebuffer[(x)+width*(y)]
 #define FONT_ROWS 16
 #define FONT_COLS 8
+
+#define SWITCHCALLS 127
 
 static u16 *framebuffer;
 static u32 width, height, bpp;
@@ -97,6 +100,11 @@ int printf(const char *fmt, ...)
 	return i;
 }
 
+int inline print(const char *txt)
+{
+	return puts(txt);
+}
+
 void put_pc()
 {
 	u32 pc;
@@ -134,4 +142,19 @@ void make_it_pink()
 	}
 
 	put_pc();
+}
+
+static u16 tillswitch = 0;
+
+void switch_led()
+{
+	if (tillswitch==SWITCHCALLS) {
+		if(GET_PALMLD_GPIO(GREEN_LED))
+			SET_PALMLD_GPIO(GREEN_LED, 0);
+		else
+			SET_PALMLD_GPIO(GREEN_LED, 1);
+		tillswitch++;
+	}else{
+		tillswitch++;
+	}
 }

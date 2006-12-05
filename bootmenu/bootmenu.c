@@ -29,13 +29,14 @@ void pxa_gpio_mode(int gpio_mode)
 
 int main()
 {
-	u32 machcode[2] = {0,0};
+//	u32 machcode[2] = {0,0};
 	pxa_gpio_mode(GPIO_NR_PALMLD_GREEN_LED_MD);
 	SET_PALMLD_GPIO(GREEN_LED, 1);
 
 	init_video();
 	fill_screen(RGB16(5,5,5));
-	puts("Bootmenu v0.1\nBy Alex Osborne\n\n");
+	puts("Bootmenu v0.1\nMostly By Alex Osborne\n");
+	puts("And Some by Fahrzin Hemmati\n\n");
 
 	u32 cpu = get_cpu();
 	printf("[CPU] %s %s\n", get_cpu_vendor(cpu), get_cpu_name(cpu));

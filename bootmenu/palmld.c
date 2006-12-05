@@ -44,8 +44,8 @@ static keypad_matrix palmld_keypad = {
 
 void init_palmld()
 {
-	printf("Initting LifeDrive\n");
+	print("Initting LifeDrive\n");
 	init_keypad(&palmld_keypad);
 	init_ide();
-	printf("LifeDrive\n");
+	print("LifeDrive\n");
 }

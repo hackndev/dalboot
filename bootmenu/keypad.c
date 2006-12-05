@@ -36,7 +36,7 @@ int read_keypad()
 
 	if (kp->pxa27x) {
 		KPC |= KPC_AS; /* initiate scan */
-		while (KPAS & KPAS_SO); /* wait for completion */
+		while (KPAS & KPAS_SO) switch_led(); /* wait for completion */
 
 		if (KPAS & (1<<26))  { /* something pressed? */
 			col = KPAS & 0xf;

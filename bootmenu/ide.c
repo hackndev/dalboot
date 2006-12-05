@@ -150,5 +150,6 @@ void init_ide()
 	int i;
 	for (i=0x1be; i<512; i++)
 		printf("%x ", mbr[i]);
+	print("\n");
 	
 }

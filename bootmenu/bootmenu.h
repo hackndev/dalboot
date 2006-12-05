@@ -9,6 +9,8 @@ void init_video();
 int putchar(int c);
 int puts(const char *s);
 int printf(const char *fmt, ...);
+int inline print(const char *txt);
+void switch_led();
 #define RGB16(r,g,b) ((r<<11)+(g<<5)+b)
 
 /* start.S */
