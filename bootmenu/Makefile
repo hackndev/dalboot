@@ -7,7 +7,7 @@ SRCS=start.S bootmenu.c font.S video.c mach.c vsprintf.c string.c ctype.c \
 	div64.S keypad.c palmcard.c palmld.c ide.c io-readsw-armv4.S
 LIBGCC=-lgcc
 
-all: BigDAL-bm.prc
+all: BigDAL-bm.prc zImage
 
 zImage: BigDAL-bm.prc
 	cp BigDAL-bm.prc zImage

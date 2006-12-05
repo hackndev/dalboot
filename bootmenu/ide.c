@@ -94,7 +94,11 @@ static void identify()
 {
 	u16 *buffer = (u16*) &cardinfo;
 	io_reg[IDE_STATUS] = CMD_IDENTIFY;
-	while (io_reg[IDE_STATUS] & STATUS_BSY);
+	SET_PALMLD_GPIO(GREEN_LED, 0);
+	SET_PALMLD_GPIO(ORANGE_LED, 1);
+	while (io_reg[IDE_STATUS] & STATUS_BSY); //LED is orange
+	SET_PALMLD_GPIO(GREEN_LED, 1);
+	SET_PALMLD_GPIO(ORANGE_LED, 0);
 	if (io_reg[IDE_STATUS] & STATUS_DRQ) {
 		readsw((void*)io_reg + IDE_DATA, buffer, 256);
 		swapbytes((u16*)cardinfo.serial, 10);
@@ -113,7 +117,11 @@ static void read_sectors(u32 start, int count, void *buf)
 	io_reg[IDE_HCYL] = (start >> 16) & 0xff;
 	io_reg[IDE_SELECT] = ((start >> 24) & 0xf) | 0xe0;
 	io_reg[IDE_STATUS] = CMD_RD_SECTORS;
-	while (io_reg[IDE_STATUS] & STATUS_BSY);
+	SET_PALMLD_GPIO(GREEN_LED, 0);
+	SET_PALMLD_GPIO(ORANGE_LED, 1);
+	while (io_reg[IDE_STATUS] & STATUS_BSY); //LED is orange
+	SET_PALMLD_GPIO(GREEN_LED, 1);
+	SET_PALMLD_GPIO(ORANGE_LED, 0);
 	
 	for (i=0; i<count; i++) {
 		if (io_reg[IDE_STATUS] & STATUS_DRQ) {
