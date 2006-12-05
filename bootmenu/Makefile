@@ -9,8 +9,8 @@ LIBGCC=-lgcc
 
 all: BigDAL-bm.prc zImage
 
-zImage: BigDAL-bm.prc
-	cp BigDAL-bm.prc zImage
+zImage: bootmenu.bin
+	cp bootmenu.bin zImage
 
 BigDAL-bm.prc: bootmenu.bin
 	python ../dalmod/dalmod.py ../BigDAL.prc bootmenu.bin
