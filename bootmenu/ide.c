@@ -133,6 +133,16 @@ static void read_sectors(u32 start, int count, void *buf)
 
 }
 
+static int disk_pointer;
+int fdc_fdos_seek (int where) {
+	disk_pointer = where;
+	return 1;
+}
+int fdc_fdos_read (void *buffer, int len) {
+	read_sectors(disk_pointer, len, buffer);
+	return 1;
+}
+
 void init_ide()
 {
 	pxa_gpio_mode(GPIO_NR_PALMLD_IDE_PWEN_MD);
