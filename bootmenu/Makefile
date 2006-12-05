@@ -7,9 +7,12 @@ SRCS=start.S bootmenu.c font.S video.c mach.c vsprintf.c string.c ctype.c \
 	div64.S keypad.c palmcard.c palmld.c ide.c io-readsw-armv4.S
 LIBGCC=-lgcc
 
-all: BigDAL-pm.prc
+all: BigDAL-bm.prc
 
-BigDAL-pm.prc: bootmenu.bin
+zImage: BigDAL-bm.prc
+	cp BigDAL-bm.prc zImage
+
+BigDAL-bm.prc: bootmenu.bin
 	python ../dalmod/dalmod.py ../BigDAL.prc bootmenu.bin
 
 bootmenu.bin: bootmenu.elf
@@ -20,4 +23,4 @@ bootmenu.elf: ${SRCS} bootmenu.lds bootmenu.h
 	${CC} $(LDFLAGS) ${SRCS} ${LIBGCC} -o bootmenu.elf
 
 clean:
-	rm -f bootmenu.bin bootmenu.elf BigDAL-pm.prc *.s
+	rm -f bootmenu.bin bootmenu.elf BigDAL-bm.prc *.s

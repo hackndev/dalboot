@@ -1,3 +1,7 @@
 *.prc
 *.pdb
 *.pyc
+*.s
+*.bin
+*.elf
+zImage
