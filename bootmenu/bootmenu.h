@@ -1,3 +1,5 @@
+//#ifndef _BOOTMENU_H_
+//#define _BOOTMENU_H_
 
 #include "stddef.h"
 
@@ -49,6 +51,7 @@ void init_palmcard();
 void init_ide();
 int fdc_fdos_read(void *buffer, int len);
 int fdc_fdos_seek(int where);
+void read_a_file(char * name);
 
 /* io-readsw-armv4.S */
 void readsw(const void *addr, void *data, int wordlen);
@@ -60,3 +63,5 @@ void readsw(const void *addr, void *data, int wordlen);
 
 /* machine init */
 void init_palmld();
+
+//#endif

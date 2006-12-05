@@ -47,6 +47,8 @@ int main()
 	init_palmld();
 	init_palmcard();
 	
+	read_a_file("linux.boot.cfg");
+	
 	int k;
 	while (1) {
 		k = getchar();

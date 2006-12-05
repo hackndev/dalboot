@@ -1,6 +1,8 @@
-#include "bootmenu.h"
 #include "pxa-regs.h"
 #include "palmld-gpio.h"
+#include "dos.h"
+#include "fdos.h"
+
 
 /* IDE registers */
 #define IDE_DATA 	0
@@ -79,9 +81,9 @@ typedef struct IdentifySector {
 	u16 cmdsetext;
 	u8 padding[186];
 } __attribute__((packed)) IdentifySector;
+static IdentifySector cardinfo;
 
 static volatile u8 *io_reg = (u8*) (PALMLD_IDE_PHYS + 0x10);
-static IdentifySector cardinfo;
 
 static void swapbytes(u16 *buf, int len)
 {
@@ -162,4 +164,54 @@ void init_ide()
 		printf("%x ", mbr[i]);
 	print("\n");
 	
+}
+
+void wait_input();
+
+void read_a_file(char * name)
+{
+	printf("Starting to open file %s\n",name);
+	wait_input();
+
+	Fs_t * fs;
+	fs_init(fs); //Hangs here
+
+	print("Innited Fs_t fs\n");
+	wait_input();
+
+	File_t * file;
+	file->fs=fs;
+	file->name=name;
+	
+	print("Opening sub directory...");
+	wait_input();
+
+	open_subdir(file);
+	
+	print("Opened sub directory!\n");
+	wait_input();
+
+	Directory_t * dir;
+	Slot_t slot=file->file;	
+
+	print("Opening file...");
+	wait_input();
+
+	open_file(&slot,dir);
+	
+	print("File opened!\n");
+	wait_input();
+}
+
+
+void wait_input()
+{
+	int k;
+	while (1) {
+                k = getchar();
+                if (k) putchar(k);
+                switch (k) {
+                case 'h': return;
+                }
+        }
 }

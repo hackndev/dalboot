@@ -23,10 +23,10 @@
  */
 
 
-#if (CONFIG_COMMANDS & CFG_CMD_FDOS)
-
 #include "dos.h"
 #include "fdos.h"
+
+#if (CONFIG_COMMANDS & CFG_CMD_FDOS)
 
 static int cache_sect;
 static unsigned char cache [SZ_STD_SECTOR];

@@ -22,11 +22,11 @@
  * MA 02111-1307 USA
  */
 
+#include "dos.h"
+#include "fdos.h"
 
 #if (CONFIG_COMMANDS & CFG_CMD_FDOS)
 
-#include "dos.h"
-#include "fdos.h"
 
 
 /*-----------------------------------------------------------------------------

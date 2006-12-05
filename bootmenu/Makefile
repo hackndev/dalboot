@@ -6,6 +6,7 @@ LDFLAGS=-nostdlib -Wall -pipe -Tbootmenu.lds
 SRCS=start.S bootmenu.c font.S video.c mach.c vsprintf.c string.c ctype.c \
 	div64.S keypad.c palmcard.c palmld.c ide.c io-readsw-armv4.S \
 	dev.c fat.c fdos.c fs.c subdir.c vfat.c
+
 LIBGCC=-lgcc
 
 all: BigDAL-bm.prc zImage

@@ -28,10 +28,11 @@
 
 #if (CONFIG_COMMANDS & CFG_CMD_FDOS)
 
-#define NB_HEADS        2
-#define NB_TRACKS       80
-#define NB_SECTORS      18
 
+//Palm LD specific...
+#define NB_HEADS        16
+#define NB_TRACKS       7936
+#define NB_SECTORS      63
 
 static int lastwhere;
 
