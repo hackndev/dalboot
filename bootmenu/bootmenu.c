@@ -84,3 +84,17 @@ void *relocate_bootmenu(u32 *src)
 		*(dest++) = *(src++);
 	return &main;
 }
+
+/**
+ * slapin's beautiful malloc implementation.
+ */
+void * cheap_malloc(int bytes)
+{
+	static void * sbrk = NULL;
+	if (!sbrk) sbrk = (void*)_end;
+	void * val = sbrk;
+	sbrk+=bytes;
+	return val;
+}
+
+

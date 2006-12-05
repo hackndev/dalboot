@@ -26,6 +26,10 @@ const char *get_cpu_name(u32 cpu);
 
 /* bootmenu.c */
 void pxa_gpio_mode(int gpio_mode);
+void *cheap_malloc(int bytes);
+#define malloc(x) cheap_malloc(x)
+#define free(x) do { } while(0)
+
 
 /* keypad.c */
 typedef struct keypad_matrix {
