@@ -43,6 +43,8 @@ void init_palmcard();
 
 /* ide.c */
 void init_ide();
+int fdc_fdos_read(void *buffer, int len);
+int fdc_fdos_seek(int where);
 
 /* io-readsw-armv4.S */
 void readsw(const void *addr, void *data, int wordlen);
