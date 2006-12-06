@@ -36,7 +36,7 @@
 #define __le16_to_cpu(x) x
 typedef unsigned long ulong;
 
-#undef	FDOS_DEBUG
+#define	FDOS_DEBUG
 
 #ifdef	FDOS_DEBUG
 #define	PRINTF(fmt,args...)	printf (fmt ,##args)

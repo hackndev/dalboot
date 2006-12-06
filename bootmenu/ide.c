@@ -113,35 +113,40 @@ static void identify()
 static void read_sectors(u32 start, int count, void *buf)
 {
 	int i;
+	printf("reading: %lu %d\n", start, count);
 	io_reg[IDE_NSECTOR] = count & 0xff;
 	io_reg[IDE_SECTOR] = start & 0xff;
 	io_reg[IDE_LCYL] = (start >> 8) & 0xff;
 	io_reg[IDE_HCYL] = (start >> 16) & 0xff;
 	io_reg[IDE_SELECT] = ((start >> 24) & 0xf) | 0xe0;
 	io_reg[IDE_STATUS] = CMD_RD_SECTORS;
+
+	puts("waiting for busy\n");
 	SET_PALMLD_GPIO(GREEN_LED, 0);
 	SET_PALMLD_GPIO(ORANGE_LED, 1);
 	while (io_reg[IDE_STATUS] & STATUS_BSY); //LED is orange
 	SET_PALMLD_GPIO(GREEN_LED, 1);
 	SET_PALMLD_GPIO(ORANGE_LED, 0);
 	
+	puts("reading\n");
 	for (i=0; i<count; i++) {
 		if (io_reg[IDE_STATUS] & STATUS_DRQ) {
 			readsw((void*)io_reg + IDE_DATA, buf+512*i, 256);
 		} else {
-			printf("Read error\n");
+			puts("Read error\n");
 		}
 	}
 
+	puts("done\n");
 }
 
-static int disk_pointer;
+static int disk_pointer=0;
 int fdc_fdos_seek (int where) {
 	disk_pointer = where;
 	return 1;
 }
 int fdc_fdos_read (void *buffer, int len) {
-	read_sectors(disk_pointer, len, buffer);
+	read_sectors(disk_pointer + 179326, len, buffer);
 	return 1;
 }
 
@@ -174,8 +179,10 @@ void read_a_file(char * name)
 	wait_input();
 
 	Fs_t * fs;
-	fs_init(fs); //Hangs here
-
+	if (fs_init(fs)) { //Hangs here
+		printf("fs_init errored\n");
+		return;
+	}
 	print("Innited Fs_t fs\n");
 	wait_input();
 

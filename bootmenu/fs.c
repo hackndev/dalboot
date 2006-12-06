@@ -48,6 +48,7 @@ static int fill_fs (BootSector_t *boot, Fs_t *fs)
     return (0);
 }
 
+BootSector_t g_boot;
 /*-----------------------------------------------------------------------------
  * fs_init --
  *-----------------------------------------------------------------------------
@@ -56,19 +57,26 @@ int fs_init (Fs_t *fs)
 {
     BootSector_t *boot;
 
+    print("dev_open()\n");
     /* Initialize physical device                                            */
     if (dev_open () < 0) {
 	PRINTF ("Unable to initialize the fdc\n");
 	return (-1);
     }
+
+    print("init_subdir()\n");
     init_subdir ();
 
+    print("malloc() boot sector\n");
     /* Allocate space for read the boot sector                               */
+    /*
     if ((boot = (BootSector_t *)malloc (sizeof (BootSector_t))) == NULL) {
 	PRINTF ("Unable to allocate space for boot sector\n");
 	return (-1);
-    }
+    }*/
+    boot = &g_boot;
 
+    print("read boot sector\n");
     /* read boot sector                                                      */
     if (dev_read (boot, 0, 1)){
 	PRINTF ("Error during boot sector read\n");
@@ -76,6 +84,7 @@ int fs_init (Fs_t *fs)
 	return (-1);
     }
 
+    print("DOS verify");
     /* we verify it'a a DOS diskette                                         */
     if (boot -> jump [0] !=  JUMP_0_1 && boot -> jump [0] !=  JUMP_0_2) {
 	PRINTF ("Not a DOS diskette\n");
@@ -83,6 +92,7 @@ int fs_init (Fs_t *fs)
 	return (-1);
     }
 
+    print("media check\n");
     if (boot -> descr < MEDIA_STD) {
 	/* We handle only recent medias (type F0)                            */
 	PRINTF ("unrecognized diskette type\n");
@@ -90,18 +100,21 @@ int fs_init (Fs_t *fs)
 	return (-1);
     }
 
+    print("check_dev\n");
     if (check_dev (boot, fs) < 0) {
 	PRINTF ("Bad diskette\n");
 	free (boot);
 	return (-1);
     }
 
+    print("fill_fs\n");
     if (fill_fs (boot, fs) < 0) {
 	free (boot);
 
 	return (-1);
     }
 
+    print("read_fat\n");
     /* Read FAT                                                              */
     if (read_fat (boot, fs) < 0) {
 	free (boot);

@@ -63,6 +63,7 @@ int dev_read (void *buffer, int where, int len)
 	}
     }
 
+    print("seeked\n");
     if (!fdc_fdos_read (buffer, len)) {
 	PRINTF ("read error\n");
 	lastwhere = -1;
