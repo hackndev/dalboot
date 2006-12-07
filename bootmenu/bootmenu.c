@@ -90,10 +90,13 @@ void *relocate_bootmenu(u32 *src)
 /**
  * slapin's beautiful malloc implementation.
  */
+static void * sbrk = NULL;
+
 void * cheap_malloc(int bytes)
 {
-	static void * sbrk = NULL;
-	if (!sbrk) sbrk = (void*)_end;
+	print ( "cheapo_malloc()\n" );
+	if ( !sbrk ) sbrk = (void *)_end;
+	printf ("_end=%lu",(u32)_end); // _end is 0... wth?
 	void * val = sbrk;
 	sbrk+=bytes;
 	return val;
