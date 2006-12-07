@@ -59,6 +59,8 @@ static int check_fat (Fs_t *fs)
 	f = fat_decode (fs, i);
 	if (f < FAT12_LAST && f > fs -> num_clus){
 	    /* Wrong cluster number detected                                 */
+	    PRINTF ( "Wrong cluster number detected. %u < %u && %u > %u\n", 
+			f, FAT12_LAST, f, fs -> num_clus);
 	    return (-1);
 	}
     }
@@ -78,19 +80,22 @@ static int read_one_fat (BootSector_t *boot, Fs_t *fs, int nfat)
 
     if (fs -> fat_buf [0] || fs -> fat_buf [1] || fs -> fat_buf [2]) {
 	if ((fs -> fat_buf [0] != boot -> descr &&
-	     (fs -> fat_buf [0] != 0xf9 || boot -> descr != MEDIA_STD)) ||
+	     (fs -> fat_buf [0] != 0xf9 || boot -> descr != MEDIA_STD)) || //Might be device specific here?
 	    fs -> fat_buf [0] < MEDIA_STD){
 	    /* Unknown Media                                                 */
+	    PRINT ( "Unknown Media...\n" );
 	    return (-1);
 	}
 	if (fs -> fat_buf [1] != 0xff || fs -> fat_buf [2] != 0xff){
 	    /* FAT doesn't start with good values                            */
+	    PRINTF ( "FAT doesn't start with good value(s): %c %c\n",fs -> fat_buf [1] , fs -> fat_buf [2]);
 	    return (-1);
 	}
     }
 
     if (fs -> num_clus >= FAT12_MAX_NB) {
 	/* Too much clusters                                                 */
+	PRINTF ( "Too many clusters: %u >= %u\n", fs -> num_clus,FAT12_MAX_NB);
 	return (-1);
     }
 
@@ -112,6 +117,7 @@ int read_fat (BootSector_t *boot, Fs_t *fs)
     }
 
     if ((fs -> fat_buf = malloc (buflen)) == NULL) {
+	PRINT ( "malloc returned NULL pointer...\n" );
 	return (-1);
     }
 
@@ -125,12 +131,14 @@ int read_fat (BootSector_t *boot, Fs_t *fs)
     }
 
     if (i == fs -> nb_fat){
+	PRINT ( "None of the FATs were any good...\n" );
 	return (-1);
     }
 
     if (fs -> fat_len > (((fs -> num_clus + 2) *
 			  (FAT_BITS / 4) -1 ) / 2 /
 			 SZ_STD_SECTOR + 1)) {
+	PRINT ( "Something crazy just happened...\n" );
 	return (-1);
     }
     return (0);

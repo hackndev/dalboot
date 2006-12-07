@@ -53,6 +53,7 @@ int putchar(int c)
 		return 1;
 	case '\n':
 		cursory++;
+		if(cursory>=height/FONT_ROWS) { wait_input(); disp_clear(); }
 	case '\r':
 		cursorx=0;
 		break;
@@ -157,4 +158,9 @@ void switch_led()
 	}else{
 		tillswitch++;
 	}
+}
+
+void disp_clear()
+{
+	fill_screen(RGB16(5,5,5));
 }

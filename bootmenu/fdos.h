@@ -40,8 +40,10 @@ typedef unsigned long ulong;
 
 #ifdef	FDOS_DEBUG
 #define	PRINTF(fmt,args...)	printf (fmt ,##args)
+#define	PRINT(fmt)		print(fmt)
 #else
 #define PRINTF(fmt,args...)
+#define PRINT(fmt)
 #endif
 
 /* Data structure describing media                                           */

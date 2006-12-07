@@ -171,16 +171,15 @@ void init_ide()
 	
 }
 
-void wait_input();
-
 void read_a_file(char * name)
 {
 	printf("Starting to open file %s\n",name);
 	wait_input();
 
 	Fs_t * fs;
-	if (fs_init(fs)) { //Hangs here
-		printf("fs_init errored\n");
+	int tmp=fs_init(fs);
+	if (tmp) { //Hangs here
+		printf("fs_init errored: %u\n",tmp);
 		return;
 	}
 	print("Innited Fs_t fs\n");
@@ -208,17 +207,4 @@ void read_a_file(char * name)
 	
 	print("File opened!\n");
 	wait_input();
-}
-
-
-void wait_input()
-{
-	int k;
-	while (1) {
-                k = getchar();
-                if (k) putchar(k);
-                switch (k) {
-                case 'h': return;
-                }
-        }
 }

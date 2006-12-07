@@ -30,9 +30,16 @@
 
 
 //Palm LD specific...
+#define NB_HEADS        128
+#define NB_TRACKS       970
+#define NB_SECTORS      63
+
+/* It seems the data in the FAT header on the disk is wacky.
+    Should fix this later. Obviously POS doesn't care about _another_
+     header.
 #define NB_HEADS        16
 #define NB_TRACKS       7936
-#define NB_SECTORS      63
+*/
 
 static int lastwhere;
 
@@ -81,6 +88,8 @@ int check_dev (BootSector_t *boot, Fs_t *fs)
     unsigned int heads, sectors, tracks;
     int BootP, Infp0, InfpX, InfTm;
     int sect_per_track;
+
+    disp_clear();
 
     /* Display Boot header                                                   */
     PRINTF ("Jump to boot code                  0x%02x 0x%02x 0x%02x\n",
@@ -176,6 +185,8 @@ int check_dev (BootSector_t *boot, Fs_t *fs)
 	InfpX >= Infp0 &&
 	Infp0 >= 76 ) {
 
+	PRINTF("Extended boot...failed?");
+
 	return (-1);
     }
 
@@ -184,7 +195,18 @@ int check_dev (BootSector_t *boot, Fs_t *fs)
 	sectors != NB_SECTORS ||
 	__le16_to_cpu (boot -> secsiz) != SZ_STD_SECTOR ||
 	fs -> tot_sectors == 0 ||
-	(fs -> tot_sectors % sectors) != 0) {
+	((fs -> tot_sectors-1) % sectors) != 0) {
+
+	PRINT("   ONE OF THESE ARE TRUE!:\n");
+	PRINTF("%u != %u\n",NB_HEADS,heads);
+	PRINTF("%u != %u\n",NB_TRACKS,tracks);
+	PRINTF("%u != %u\n",NB_SECTORS,sectors);
+
+	PRINTF("%u != %d\n",SZ_STD_SECTOR,boot -> secsiz);
+
+	PRINTF("(tot_sectors = %lu) == 0\n",fs -> tot_sectors);
+	PRINTF("((tot_sectors-1) %% sectors = %lu) != 0\n",fs -> tot_sectors % sectors);
+	
 	return (-1);
     }
 

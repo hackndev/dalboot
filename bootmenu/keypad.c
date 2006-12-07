@@ -67,3 +67,16 @@ int getchar()
 	while (!c) c = read_keypad();
 	return c;
 }
+
+void wait_input()
+{
+        int k;
+        while (1) {
+                k = getchar();
+                if (k) putchar(k);
+                switch (k) {
+                case 'h': return;
+                }
+        }
+}
+

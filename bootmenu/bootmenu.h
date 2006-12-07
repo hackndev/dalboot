@@ -13,6 +13,7 @@ int puts(const char *s);
 int printf(const char *fmt, ...);
 int inline print(const char *txt);
 void switch_led();
+void disp_clear();
 #define RGB16(r,g,b) ((r<<11)+(g<<5)+b)
 
 /* start.S */
@@ -43,6 +44,7 @@ typedef struct keypad_matrix {
 void init_keypad(keypad_matrix *keypad);
 int read_keypad();
 int getchar();
+void wait_input();
 
 /* palmcard.c */
 void init_palmcard();
