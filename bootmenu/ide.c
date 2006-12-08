@@ -177,7 +177,6 @@ void init_ide()
 void read_a_file(char * name)
 {
 	printf("Starting to open file %s\n",name);
-	wait_input();
 
 	Fs_t * fs;
 	int tmp=fs_init(fs);
@@ -186,37 +185,30 @@ void read_a_file(char * name)
 		return;
 	}
 	print("Innited Fs_t fs\n");
-	wait_input();
 
 	File_t * file;
 	file->fs=fs;
 	file->name=name;
 	
-	print("Opening sub directory...");
-	wait_input();
+	print("Opening sub directory... ");
 
 	open_subdir(file);
 	
 	print("Opened sub directory!\n");
-	wait_input();
 
 	Directory_t * dir;
 	Slot_t slot=file->file;	
 
 	print("Opening file...");
-	wait_input();
 
 	open_file(&slot,dir);
 	
 	print("File opened!\n");
 	print("Reading file...\n");
-	wait_input();
 
-#define READBYTES	16
+#define READBYTES	64
 	char buffer[READBYTES];
+//	skip first byte because it gives us errors and doesn't get shown anyway
 	read_file(fs,&slot,buffer,1,READBYTES);
 	printf("First %d chars of %s is :%s:", READBYTES, name, buffer);
-	wait_input();
-
-	
 }

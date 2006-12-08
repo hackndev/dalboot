@@ -98,6 +98,9 @@ void * cheap_malloc(int bytes)
 	if ( !sbrk ) sbrk = (void *)&_end;
 	printf ("sbrk=%lx\n",(u32)sbrk);
 	void * val = sbrk;
+	int tmp;
+	for(tmp=0;tmp<bytes;tmp++)
+		*((int*)(sbrk+tmp)) = 0;
 	sbrk+=bytes;
 	return val;
 }
