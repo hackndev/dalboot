@@ -96,18 +96,23 @@ static void identify()
 {
 	u16 *buffer = (u16*) &cardinfo;
 	io_reg[IDE_STATUS] = CMD_IDENTIFY;
-	SET_PALMLD_GPIO(GREEN_LED, 0);
-	SET_PALMLD_GPIO(ORANGE_LED, 1);
 	while (io_reg[IDE_STATUS] & STATUS_BSY); //LED is orange
-	SET_PALMLD_GPIO(GREEN_LED, 1);
-	SET_PALMLD_GPIO(ORANGE_LED, 0);
 	if (io_reg[IDE_STATUS] & STATUS_DRQ) {
-		readsw((void*)io_reg + IDE_DATA, buffer, 256);
+		readsw_led((void*)io_reg + IDE_DATA, buffer, 256);
 		swapbytes((u16*)cardinfo.serial, 10);
 		swapbytes((u16*)cardinfo.model, 20);
 	} else {
 		printf("Read error\n");
 	}
+}
+
+void readsw_led(const void *a, void *b, int c)
+{
+	SET_PALMLD_GPIO(GREEN_LED, 0);
+	SET_PALMLD_GPIO(ORANGE_LED, 1);
+	readsw(a,b,c);
+	SET_PALMLD_GPIO(GREEN_LED, 1);
+	SET_PALMLD_GPIO(ORANGE_LED, 0);
 }
 
 static void read_sectors(u32 start, int count, void *buf)
@@ -122,16 +127,14 @@ static void read_sectors(u32 start, int count, void *buf)
 	io_reg[IDE_STATUS] = CMD_RD_SECTORS;
 
 	puts("waiting for busy\n");
-	SET_PALMLD_GPIO(GREEN_LED, 0);
-	SET_PALMLD_GPIO(ORANGE_LED, 1);
 	while (io_reg[IDE_STATUS] & STATUS_BSY); //LED is orange
-	SET_PALMLD_GPIO(GREEN_LED, 1);
-	SET_PALMLD_GPIO(ORANGE_LED, 0);
 	
 	puts("reading\n");
 	for (i=0; i<count; i++) {
+		printf("Count: %d\n", i);
 		if (io_reg[IDE_STATUS] & STATUS_DRQ) {
-			readsw((void*)io_reg + IDE_DATA, buf+512*i, 256);
+			print ("io_reg[IDE_STATUS] is good\n");
+			readsw_led((void*)io_reg + IDE_DATA, buf+512*i, 256);
 		} else {
 			puts("Read error\n");
 		}
@@ -206,5 +209,14 @@ void read_a_file(char * name)
 	open_file(&slot,dir);
 	
 	print("File opened!\n");
+	print("Reading file...\n");
 	wait_input();
+
+#define READBYTES	16
+	char buffer[READBYTES];
+	read_file(fs,&slot,buffer,1,READBYTES);
+	printf("First %d chars of %s is :%s:", READBYTES, name, buffer);
+	wait_input();
+
+	
 }

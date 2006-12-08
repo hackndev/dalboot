@@ -94,9 +94,9 @@ static void * sbrk = NULL;
 
 void * cheap_malloc(int bytes)
 {
-	print ( "cheapo_malloc()\n" );
+//	print ( "cheapo_malloc(): " );
 	if ( !sbrk ) sbrk = (void *)&_end;
-	printf ("_end=%lu",(u32)&_end); // _end is 0... wth?
+	printf ("sbrk=%lx\n",(u32)sbrk);
 	void * val = sbrk;
 	sbrk+=bytes;
 	return val;

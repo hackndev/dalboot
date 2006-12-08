@@ -57,6 +57,8 @@ static int check_fat (Fs_t *fs)
     /* Cluster verification                                                  */
     for (i = 3 ; i < fs -> num_clus; i++){
 	f = fat_decode (fs, i);
+	PRINTF ( "Cluster number detected: %u and %u\n", 
+		f, fs -> num_clus);
 	if (f < FAT12_LAST && f > fs -> num_clus){
 	    /* Wrong cluster number detected                                 */
 	    PRINTF ( "Wrong cluster number detected. %u < %u && %u > %u\n", 
@@ -75,6 +77,7 @@ static int read_one_fat (BootSector_t *boot, Fs_t *fs, int nfat)
     if (dev_read (fs -> fat_buf,
 		  (fs -> fat_start + nfat * fs -> fat_len),
 		  fs -> fat_len) < 0) {
+	PRINT ( "dev_read() failed us!\n" );
 	return (-1);
     }
 
@@ -83,8 +86,11 @@ static int read_one_fat (BootSector_t *boot, Fs_t *fs, int nfat)
 	     (fs -> fat_buf [0] != 0xf9 || boot -> descr != MEDIA_STD)) || //Might be device specific here?
 	    fs -> fat_buf [0] < MEDIA_STD){
 	    /* Unknown Media                                                 */
+	    /* We should probably ignore all this like POS...		     */
 	    PRINT ( "Unknown Media...\n" );
-	    return (-1);
+	    PRINTF( "fs->fat_buf[0] = %u\nboot->descr = %u\nMEDIA_STD = %u\n",
+			fs->fat_buf[0],boot->descr,MEDIA_STD);
+/*	    return (-1);	We have bad media?			     */
 	}
 	if (fs -> fat_buf [1] != 0xff || fs -> fat_buf [2] != 0xff){
 	    /* FAT doesn't start with good values                            */
@@ -94,7 +100,7 @@ static int read_one_fat (BootSector_t *boot, Fs_t *fs, int nfat)
     }
 
     if (fs -> num_clus >= FAT12_MAX_NB) {
-	/* Too much clusters                                                 */
+	/* Too many clusters                                                 */
 	PRINTF ( "Too many clusters: %u >= %u\n", fs -> num_clus,FAT12_MAX_NB);
 	return (-1);
     }
@@ -122,9 +128,11 @@ int read_fat (BootSector_t *boot, Fs_t *fs)
     }
 
     /* Try to read each Fat                                                  */
-    for (i = 0; i< fs -> nb_fat; i++){
+    for (i = 1; i<= fs -> nb_fat; i++){
+	PRINTF( "Trying FAT %d\n:", i);
 	if (read_one_fat (boot, fs, i) == 0) {
 	    /* Fat is OK                                                     */
+	    PRINTF( "We like FAT %d!\n", i);
 	    fs -> num_fat = i;
 	    break;
 	}

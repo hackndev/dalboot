@@ -54,6 +54,7 @@ void init_ide();
 int fdc_fdos_read(void *buffer, int len);
 int fdc_fdos_seek(int where);
 void read_a_file(char * name);
+void readsw_led(const void *a, void *b, int c);
 
 /* io-readsw-armv4.S */
 void readsw(const void *addr, void *data, int wordlen);

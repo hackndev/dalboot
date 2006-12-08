@@ -73,7 +73,7 @@ void wait_input()
         int k;
         while (1) {
                 k = getchar();
-                if (k) putchar(k);
+//              if (k) putchar(k);
                 switch (k) {
                 case 'h': return;
                 }

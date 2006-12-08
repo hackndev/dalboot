@@ -69,8 +69,8 @@ int dev_read (void *buffer, int where, int len)
 	    return (-1);
 	}
     }
-
     print("seeked\n");
+
     if (!fdc_fdos_read (buffer, len)) {
 	PRINTF ("read error\n");
 	lastwhere = -1;
@@ -92,6 +92,7 @@ int check_dev (BootSector_t *boot, Fs_t *fs)
     disp_clear();
 
     /* Display Boot header                                                   */
+    
     PRINTF ("Jump to boot code                  0x%02x 0x%02x 0x%02x\n",
 	    boot -> jump [0], boot -> jump [1], boot -> jump[2]);
     PRINTF ("OEM name & version                 '%*.*s'\n",
@@ -156,6 +157,7 @@ int check_dev (BootSector_t *boot, Fs_t *fs)
 	    __le16_to_cpu (boot -> DateF));
     PRINTF ("Format time                        0x%04x\n",
 	    __le16_to_cpu (boot -> TimeF));
+    
 
 
     /* information is extracted from boot sector                           */
