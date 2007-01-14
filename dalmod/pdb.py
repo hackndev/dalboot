@@ -9,8 +9,8 @@ def main():
 	if len(sys.argv) > 1:
 		fn = sys.argv[1]
 	else:
-		fn = 'BigDAL.prc'
-	out = file('test.prc','wb')
+		fn = 'brahma-spl.pdb'
+	out = file('test.pdb','wb')
 	pdb = Pdb()
 	pdb.read(file(fn,'rb'))
 	print str(pdb)
@@ -32,10 +32,9 @@ class Pdb:
 		self.read_rlheader(f)
 		if self.isprc():
 			self.read_resourcelist(f)
-			self.read_resources(f)
 		else:
-			print 'TODO: pdb record list'
-	
+			self.read_recordlist(f)
+		self.read_resources(f)
 	def write(self, f):
 		self.write_header(f)
 		self.write_rlheader(f)
@@ -89,6 +88,15 @@ class Pdb:
 	
 	def write_rlheader(self, f):
 		f.write(struct.pack(Pdb.rlheader_fmt, 0, len(self.resources)))
+
+	def read_recordlist(self, f):
+		def read_record(i):
+			rec = PdbRecord()
+			rec.read_header(f)
+			return rec
+		self.resources = map(read_record, range(self.numrecs))
+		if f.read(2) != '\0\0':
+			print 'Warning: non-zero record list padding'
 
 	def read_resourcelist(self, f):
 		def read_resource(i):
@@ -154,5 +162,24 @@ class PrcResource:
 	def __repr__(self):
 		return '<PrcResource %s[%d] %d bytes>' % (self.type, self.id,
 								len(self.data))
+class PdbRecord:
+	header_fmt	= ('>'	## Record header
+			+ 'I'	# data offset
+			+ 'B'	# attributes
+			+ '3s')	# uniqueID
+	header_sz = struct.calcsize(header_fmt)
+
+	def read_header(self, f):
+		(self.offset, self.attrib, self.id) = struct.unpack(
+							PdbRecord.header_fmt,
+						f.read(PdbRecord.header_sz))
+	def write_header(self, f):
+		f.write(struct.pack(PdbRecord.header_fmt, self.offset, self.attrib,
+								self.id))
+
+	def __repr__(self):
+		return '<PdbRecord %s[%d] %d bytes>' % (repr(self.id), self.attrib,
+								len(self.data))
+
 
 if __name__ == '__main__': main()
