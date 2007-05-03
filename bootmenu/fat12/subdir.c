@@ -47,7 +47,7 @@ void init_subdir (void)
     cache_sect = -1;
 }
 /*-----------------------------------------------------------------------------
- * basename --
+ * basename -- Returns pointer to first char after first /
  *-----------------------------------------------------------------------------
  */
 char *basename (char *name)

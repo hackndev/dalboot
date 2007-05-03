@@ -35,8 +35,7 @@ int main()
 
 	init_video();
 	fill_screen(RGB16(5,5,5));
-	puts("Bootmenu v0.1\nMostly By Alex Osborne\n");
-	puts("And Some by Fahrzin Hemmati\n\n");
+	puts("Bootmenu v0.1\nBy Fahrzin Hemmati\n");
 
 	u32 cpu = get_cpu();
 	printf("[CPU] %s %s\n", get_cpu_vendor(cpu), get_cpu_name(cpu));
@@ -47,7 +46,7 @@ int main()
 	init_palmld();
 	init_palmcard();
 	
-	read_a_file("linux.boot.cfg");
+//	read_a_file("/linux.txt");
 	
 	int k;
 	while (1) {
@@ -95,7 +94,7 @@ static void * sbrk = NULL;
 void * cheap_malloc(int bytes)
 {
 //	print ( "cheapo_malloc(): " );
-	if ( !sbrk ) sbrk = (void *)&_end;
+	if ( !sbrk ) sbrk = (void *)&_end+0;
 	printf ("sbrk=%lx\n",(u32)sbrk);
 	void * val = sbrk;
 	int tmp;
@@ -105,4 +104,62 @@ void * cheap_malloc(int bytes)
 	return val;
 }
 
+/**
+ * fahhem's first attempt at a malloc AND free
+ *
+ * If an empty byte is put between variables, free doesn't have to take a sizeof parameter
+ */
+/*
+static u32 mems[100]; //each bit refers to 8bits of memory
+static u32 * memend = mems+sizeof(mems);
 
+void * fahhem_malloc(int bytes)
+{
+	if (!bytes) return 0;
+	
+	u32 * cm=mems;
+	u32 size = 0;
+	u32 x;
+	for(x=0;x<(bytes&0x1f);x++) size |= 1<<x;
+	while(cm<memend)
+	{
+		if(bytes>32 && *cm) continue;
+		for(x=0;x<32-(bytes&0x1f);x++)
+			if(!(*cm & (size<<x)))
+			{
+				*cm|=size<<x; //set to used
+				u32 add = ((cm-mems)<<4) + x;
+				return ((void *)&_end)+add;
+			}
+		cm++;
+
+	}
+	return 0;
+}
+
+void fahhem_free(void * ptr, int bytes)
+{
+	if ( ptr < (void *)&_end ) return;
+	u32 offset=ptr-((void *)&_end);
+	u32 bit = offset & (0x1f);
+	u32 mem = offset >> 4;
+
+	u32 size = 0;
+        u32 x;
+        for(x=0;x<bytes;x++) size |= 1<<x;
+
+	mems[mem] ^= size<<bit;
+}
+*/
+
+/*
+	Sets the LED to red while reading from the drive.
+*/
+void readsw(const void *a, void *b, int c)
+{
+	SET_PALMLD_GPIO(GREEN_LED, 0);
+	SET_PALMLD_GPIO(ORANGE_LED, 1);
+	_readsw(a,b,c);
+	SET_PALMLD_GPIO(GREEN_LED, 1);
+	SET_PALMLD_GPIO(ORANGE_LED, 0);
+}

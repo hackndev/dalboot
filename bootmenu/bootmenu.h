@@ -11,7 +11,8 @@ void init_video();
 int putchar(int c);
 int puts(const char *s);
 int printf(const char *fmt, ...);
-int inline print(const char *txt);
+#define print(x) puts(x)
+//int inline print(const char *txt);
 void switch_led();
 void disp_clear();
 #define RGB16(r,g,b) ((r<<11)+(g<<5)+b)
@@ -30,8 +31,12 @@ const char *get_cpu_name(u32 cpu);
 /* bootmenu.c */
 void pxa_gpio_mode(int gpio_mode);
 void *cheap_malloc(int bytes);
+//void *fahhem_malloc(int bytes);
+//void fahhem_free(void * ptr);
 #define malloc(x) cheap_malloc(x)
-#define free(x) do { } while(0)
+#define free(x) do{ }while(0)
+//#define malloc(x) fahhem_malloc(x)
+//#define free(x,y) fahhem_free(x,y)
 
 
 /* keypad.c */
@@ -49,15 +54,16 @@ void wait_input();
 /* palmcard.c */
 void init_palmcard();
 
-/* ide.c */
+/* ide.c 
 void init_ide();
 int fdc_fdos_read(void *buffer, int len);
 int fdc_fdos_seek(int where);
 void read_a_file(char * name);
-void readsw_led(const void *a, void *b, int c);
+*/
 
 /* io-readsw-armv4.S */
-void readsw(const void *addr, void *data, int wordlen);
+void _readsw(const void *addr, void *data, int wordlen);
+void readsw(const void *a, void *b, int c);
 
 /* machine codes (reversed) */
 #define PALMT3 'aAz1

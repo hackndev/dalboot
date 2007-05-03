@@ -46,6 +46,6 @@ void init_palmld()
 {
 	print("Initting LifeDrive\n");
 	init_keypad(&palmld_keypad);
-	init_ide();
+//	init_ide();
 	print("LifeDrive\n");
 }

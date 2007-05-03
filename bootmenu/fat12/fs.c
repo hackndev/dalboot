@@ -82,27 +82,32 @@ int fs_init (Fs_t *fs)
 	return (-1);
     }
 
-    print("DOS verify");
-    /* we verify it'a a DOS diskette                                         */
+    //DOS verify does not work on Palm LD since the DOS header of the hard drive is garbage.
+    print("DOS verify--bypassed\n");
+    /* we verify it'a a DOS diskette                                         
     if (boot -> jump [0] !=  JUMP_0_1 && boot -> jump [0] !=  JUMP_0_2) {
 	PRINT ("Not a DOS diskette\n");
 	free (boot);
 	return (-1);
-    }
+    }*/
 
-    print("media check\n");
+    //media check doesn't work either. Again, the DOS header is garbage.
+    print("media check--bypassed\n");
+    /*
     if (boot -> descr < MEDIA_STD) {
-	/* We handle only recent medias (type F0)                            */
+	 We handle only recent medias (type F8)                            
 	PRINT ("unrecognized diskette type\n");
 	free (boot);
 	return (-1);
-    }
+    }*/
 
-    print("check_dev\n");
+    //Yep! check_dev sucks too!
+    print("check_dev--bypassed\n");
+    
     if (check_dev (boot, fs) < 0) {
 	PRINT ("Bad diskette\n");
-	free (boot);
-	return (-1);
+//	free (boot);
+//	return (-1);
     }
 
     print("fill_fs\n");

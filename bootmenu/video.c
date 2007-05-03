@@ -101,10 +101,12 @@ int printf(const char *fmt, ...)
 	return i;
 }
 
+/*
 int inline print(const char *txt)
 {
 	return puts(txt);
 }
+*/
 
 void put_pc()
 {

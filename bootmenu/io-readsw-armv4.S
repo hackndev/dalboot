@@ -23,8 +23,8 @@
 		sub	r2, r2, #1
 		strh	ip, [r1], #2
 
-.globl readsw
-readsw:
+.globl _readsw
+_readsw:
 		teq	r2, #0
 		moveq	pc, lr
 		tst	r1, #3

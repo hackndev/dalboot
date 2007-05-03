@@ -4,8 +4,8 @@ OBJCOPY=${CROSS_COMPILE}objcopy
 LDFLAGS=-nostdlib -Wall -pipe -Tbootmenu.lds
 
 SRCS=start.S bootmenu.c font.S video.c mach.c vsprintf.c string.c ctype.c \
-	div64.S keypad.c palmcard.c palmld.c ide.c io-readsw-armv4.S \
-	dev.c fat.c fdos.c fs.c subdir.c vfat.c
+	div64.S keypad.c palmcard.c palmld.c io-readsw-armv4.S 
+#fs/ide.c fs/dev.c fs/fat.c fs/fdos.c fs/fs.c fs/subdir.c fs/vfat.c
 
 LIBGCC=-lgcc
 

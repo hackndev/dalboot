@@ -23,9 +23,9 @@
  */
 
 
-#if (CONFIG_COMMANDS & CFG_CMD_FDOS)
 #include "dos.h"
 #include "fdos.h"
+#if (CONFIG_COMMANDS & CFG_CMD_FDOS)
 
 
 const char *month [] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};

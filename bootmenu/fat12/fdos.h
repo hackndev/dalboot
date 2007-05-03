@@ -25,10 +25,10 @@
 #ifndef _FDOS_H_
 #define _FDOS_H_
 
-#include "stddef.h"
-#include "ctype.h"
-#include "string.h"
-#include "bootmenu.h"
+#include "../stddef.h"
+#include "../ctype.h"
+#include "../string.h"
+#include "../bootmenu.h"
 
 #define CONFIG_COMMANDS 1
 #define CFG_CMD_FDOS	1
@@ -36,7 +36,8 @@
 #define __le16_to_cpu(x) x
 typedef unsigned long ulong;
 
-#define	FDOS_DEBUG
+//#undef	FDOS_DEBUG
+#define FDOS_DEBUG
 
 #ifdef	FDOS_DEBUG
 #define	PRINTF(fmt,args...)	printf (fmt ,##args)
@@ -90,6 +91,12 @@ typedef struct file {
 } File_t;
 
 
+
+/* fdos.c                                                                    */
+int dos_open(char *name);
+int dos_read (ulong addr);
+int dos_dir (void);
+
 /* dev.c                                                                     */
 int dev_read (void *buffer, int where, int len);
 int dev_open (void);
@@ -123,6 +130,5 @@ void init_subdir (void);
 
 /* fs.c                                                                      */
 int fs_init (Fs_t *fs);
-
 
 #endif

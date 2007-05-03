@@ -57,8 +57,8 @@ static int check_fat (Fs_t *fs)
     /* Cluster verification                                                  */
     for (i = 3 ; i < fs -> num_clus; i++){
 	f = fat_decode (fs, i);
-	PRINTF ( "Cluster number detected: %u and %u\n", 
-		f, fs -> num_clus);
+/*	PRINTF ( "Cluster number detected: %u and %u\n", 
+		f, fs -> num_clus); 					     */
 	if (f < FAT12_LAST && f > fs -> num_clus){
 	    /* Wrong cluster number detected                                 */
 	    PRINTF ( "Wrong cluster number detected. %u < %u && %u > %u\n", 
@@ -95,14 +95,14 @@ static int read_one_fat (BootSector_t *boot, Fs_t *fs, int nfat)
 	if (fs -> fat_buf [1] != 0xff || fs -> fat_buf [2] != 0xff){
 	    /* FAT doesn't start with good values                            */
 	    PRINTF ( "FAT doesn't start with good value(s): %c %c\n",fs -> fat_buf [1] , fs -> fat_buf [2]);
-	    return (-1);
+/*	    return (-1);        I'm not sure this should be skipped...	     */
 	}
     }
 
     if (fs -> num_clus >= FAT12_MAX_NB) {
 	/* Too many clusters                                                 */
 	PRINTF ( "Too many clusters: %u >= %u\n", fs -> num_clus,FAT12_MAX_NB);
-	return (-1);
+	//return (-1);
     }
 
     return check_fat (fs);

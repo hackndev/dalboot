@@ -1,0 +1,4 @@
+Deprecated folders:
+
+-fat12
+We spent months trying to get this to work with a FAT32 partition. Apparently they're not compatible. Wow. Need to check what drivers are made for before copy-pasting them.

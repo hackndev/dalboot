@@ -1,5 +1,5 @@
-#include "pxa-regs.h"
-#include "palmld-gpio.h"
+#include "../pxa-regs.h"
+#include "../palmld-gpio.h"
 #include "dos.h"
 #include "fdos.h"
 
@@ -174,41 +174,106 @@ void init_ide()
 	
 }
 
+extern Fs_t * fs;
+extern File_t * file;
+
 void read_a_file(char * name)
 {
+/*
+	printf("Using fdos_open to open file %s\n",name);
+	print("Press any key to continue\n");
+	wait_input();
+	print("dos_open:\n");
+	if(dos_open(name))
+	{
+		print("dos_open() failed.\n");
+		print("Press any key to continue\n");
+		wait_input();
+		return;
+	}
+	print("dos_open() worked.\n");
+	print("Press any key to continue\n");
+	wait_input();
+	char * buf = (char *)malloc(file->file.FileSize);
+	printf("%s is %lu bytes large\n",name,file->file.FileSize);
+	print("Press any key to continue\n");
+	wait_input();
+	print("dos_read:\n");
+	if(dos_read((ulong)buf))
+	{
+		print("dos_read() failed.\n");
+		print("Press any key to continue\n");
+		wait_input();
+                return;
+	}
+	printf("We got %s from %s\n",buf,name);
+	print("Press any key to continue\n");
+	wait_input();
+*/
+
 	printf("Starting to open file %s\n",name);
 
-	Fs_t * fs;
+	Fs_t * fs = malloc(sizeof(Fs_t));
+	File_t * file = malloc(sizeof(File_t));
+
 	int tmp=fs_init(fs);
-	if (tmp) { //Hangs here
+	if (tmp) {
 		printf("fs_init errored: %u\n",tmp);
 		return;
 	}
 	print("Innited Fs_t fs\n");
 
-	File_t * file;
+	//memset(file,0,sizeof(File_t)); Already done by cheap_malloc...
 	file->fs=fs;
 	file->name=name;
-	
+	//file->subdir="/";
+		
 	print("Opening sub directory... ");
 
-	open_subdir(file);
+	if(open_subdir(file)) {
+		print("open_subdir errored\n");
+		return;
+	}
 	
 	print("Opened sub directory!\n");
 
-	Directory_t * dir;
-	Slot_t slot=file->file;	
+	int entry=0;
+	if(vfat_lookup (&file->subdir,
+			file->fs,
+			&file->file.dir,
+			&entry,
+			0,
+			name,
+			ACCEPT_DIR | ACCEPT_PLAIN | SINGLE | DO_OPEN,
+			0,
+			&file->file))
+	{
+		print ("File not found\n");
+		return;
+	}
+	print("vfat_lookup worked. Time to continue dev'ing\n");
+	return;
+
+/*	Trying another way
+
+	//Directory_t * dir;
+	Slot_t slot=file->file;
+	slot.dir=*dir;
 
 	print("Opening file...");
 
-	open_file(&slot,dir);
+	if(open_file(&slot,dir)) {
+		print("open_file errored\n");
+		return;
+	}
 	
 	print("File opened!\n");
 	print("Reading file...\n");
 
-#define READBYTES	64
+#define READBYTES	20
 	char buffer[READBYTES];
 //	skip first byte because it gives us errors and doesn't get shown anyway
 	read_file(fs,&slot,buffer,1,READBYTES);
-	printf("First %d chars of %s is :%s:", READBYTES, name, buffer);
+	printf("First %d chars of %s is :%s%s%s:", READBYTES, name, buffer,*((&buffer)+1),*((&buffer)+2));
+*/
 }
