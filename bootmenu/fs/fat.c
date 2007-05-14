@@ -133,6 +133,10 @@ void fat_read_fat_entry(u32 sector, u32 offset, u32 * buffer)
 void view_bootsector()
 {
 	sect_buf = (sector_buffer *)malloc(sizeof(sector_buffer));
+	print("Malloc worked this time...\n");
+	u32 pc;
+	asm ("mov %0, pc" : : "r" (pc));
+	printf("Got pc: %lx\n",pc);
 
 	boot = (bootsector *)malloc(sizeof(bootsector));
 	read(0,1,boot);
@@ -214,7 +218,7 @@ void view_bootsector()
 	root_dir = (fat_dir_entry *)sect_buf->data;
 	
 	print("Root directory:\n");
-	printf("\tName: %11s\n",root_dir->name);
+	printf("\tName: %.11s\n",root_dir->name);
 	printf("\tAttributes: %x\n",root_dir->attribs);
 	printf("\tFirst cluster: %lu\n", ENTRY_FIRST_CLUSTER(root_dir));
 	printf("\tFile size: %lu\n",root_dir->file_size);
@@ -236,13 +240,26 @@ void view_bootsector()
 	u32 i=0;
 	while(dir[i].name[0]!=0x0 && dir[i].name[0]!=0xE5)
 	{
-		if(dir[i].attribs!=0x2f)
+		if(dir[i].attribs!=0x0f)
 		{
 			printf("Entry %ld:\n",i);
-			printf("\tName: %11s\n",dir[i].name);
+			printf("\tName: %.11s\n",dir[i].name);
 			printf("\tAttributes: %x\n",dir[i].attribs);
 			printf("\tFirst cluster: %lu\n", ENTRY_FIRST_CLUSTER((&dir[i])));
 			printf("\tFile size: %lu\n",dir[i].file_size);
+		}else{
+			//Long name entry.
+			//Just print out the characters...We don't know if Palm uses wide-chars or just shoves them in:
+			fat_long_name_entry * long_name = (fat_long_name_entry *)dir+i;
+			printf("Long entry %d:\n",long_name->ordinal);
+			printf("\tName: %.10s%.12s%.4s\n",long_name->name1,long_name->name2,long_name->name3);
+			printf("\tWidechar name: %.5ls%.6ls%.2ls\n",(wchar_t *)long_name->name1,(wchar_t *)long_name->name2,(wchar_t *)long_name->name3);
+			char * name = (char *)malloc(13);
+			u8 a=0;
+			for(a=0;a<5;a++) name[a]=long_name->name1[a<<1];
+			for(a=5;a<11;a++) name[a]=long_name->name2[(a-5)<<1];
+			for(a=11;a<13;a++) name[a]=long_name->name3[(a-11)<<1];
+			printf("\tFixed name: %.13s\n",name);
 		}
 		i++;
 	}		

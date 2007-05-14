@@ -67,10 +67,14 @@ typedef struct
 
 typedef struct
 {
-	u8 ordinal;
-	u8 name[10];
-	u8 attribs;
-	
+	u8 ordinal;			/* 0  Order. Mask of 0x40 indicates last entry	*/
+	u8 name1[10];			/* 1  First 5 characters of name		*/
+	u8 attribs;			/* 11 Must be 0x2f				*/
+	u8 type;			/* 12 Directory entry???			*/
+	u8 checksum;			/* 13 Right-shifted checksum			*/
+	u8 name2[12];			/* 14 Characters 6-11 of name			*/
+	u16 zero;			/* 26 First cluster. Should be 0		*/
+	u8 name3[4];			/* 28 Last 2 characters of name			*/
 } GCC_OPTION(packed) fat_long_name_entry;
 
 typedef union

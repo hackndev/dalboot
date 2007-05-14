@@ -53,7 +53,7 @@ int putchar(int c)
 		return 1;
 	case '\n':
 		cursory++;
-		if(cursory>=height/FONT_ROWS) { wait_input(); disp_clear(); }
+//		if(cursory>=height/FONT_ROWS) { wait_input(); disp_clear(); }
 	case '\r':
 		cursorx=0;
 		break;
@@ -74,6 +74,8 @@ int putchar(int c)
 		cursory++;
 	}
 	if (cursory*FONT_ROWS >= height) {
+		wait_input();
+		disp_clear();
 		cursory=0;
 	}
 	return 1;

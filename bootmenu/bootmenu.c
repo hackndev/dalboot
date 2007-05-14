@@ -1,6 +1,30 @@
 #include "palmld-gpio.h"
 #include "bootmenu.h"
 
+/**
+ * slapin's beautiful malloc implementation.
+ */
+static void * sbrk = NULL;
+
+void * cheap_malloc(int bytes)
+{
+//	print ( "cheapo_malloc(): " );
+	printf("sbrk=%lx->",(u32)sbrk);
+//	if ( !sbrk ) sbrk = (void *)&_end;
+	printf ("%lx->",(u32)sbrk);
+	void * val = sbrk;
+	int tmp;
+	for(tmp=0;tmp<bytes;tmp++)
+	{
+//		printf("%lx %x\n",(u32)sbrk,tmp);
+//		print(".");
+		*((int*)(sbrk+tmp)) = 0;
+	}
+	sbrk+=bytes;
+	printf("%lx\n",(u32)sbrk);
+	return val;
+}
+
 /*
  * Handy function to set GPIO alternate functions
  *  From:	linux/arch/arm/mach-pxa/generic.c
@@ -39,10 +63,13 @@ int main()
 
 	init_video();
 	fill_screen(RGB16(5,5,5));
-	puts("Bootmenu v0.1\nBy Fahrzin Hemmati\n");
+	puts("Bootmenu v0.2\nBy Fahrzin Hemmati\n");
 
 	u32 cpu = get_cpu();
 	printf("[CPU] %s %s\n", get_cpu_vendor(cpu), get_cpu_name(cpu));
+	
+	printf("_start: %lx\n_end: %lx\nsbrk: %lx",(u32)&_start,(u32)&_end,(u32)sbrk);
+	sbrk = (void *)&_end;
 
 	//machcode[0] = get_rom_mach();
 	//printf("[MACH] %s\n", (char*)machcode);
@@ -89,29 +116,6 @@ int raise(int sig)
 {
 	puts("libgcc error. div by zero?\n");
 	while(1);
-}
-
-/**
- * slapin's beautiful malloc implementation.
- */
-static void * sbrk = NULL;
-
-void * cheap_malloc(int bytes)
-{
-//	print ( "cheapo_malloc(): " );
-	if ( !sbrk ) sbrk = (void *)&_end+0;
-	printf ("sbrk=%lx->",(u32)sbrk);
-	void * val = sbrk;
-	int tmp;
-	for(tmp=0;tmp<bytes;tmp++)
-	{
-//		printf("%lx %x\n",(u32)sbrk,tmp);
-//		print(".");
-		*((int*)(sbrk+tmp)) = 0;
-	}
-	sbrk+=bytes;
-	printf("%lx\n",(u32)sbrk);
-	return val;
 }
 
 /**

@@ -67,10 +67,11 @@ void _readsw(const void *addr, void *data, int wordlen);
 void readsw(const void *a, void *b, int c);
 
 /* machine codes (reversed) */
-#define PALMT3 'aAz1
+#define PALMT3 'aAz1'
 #define PALMT5 'ANGS'
 //#define PALMLD 'BRMA'
-#define PALMLD (('B'<<24)+('R'<<16)+('M'<<8)+('A'<<0))
+//#define PALMLD (('B'<<24)+('R'<<16)+('M'<<8)+('A'<<0))
+#define PALMLD 0x42524D41
 
 /* machine init */
 void init_palmld();

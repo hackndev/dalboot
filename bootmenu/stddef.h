@@ -5,13 +5,9 @@ typedef unsigned long u32;
 typedef unsigned short u16;
 typedef unsigned long size_t;
 typedef unsigned char u8;
+typedef __WCHAR_TYPE__ wchar_t;
 
-#undef NULL
-#if defined(__cplusplus)
-#define NULL 0
-#else
 #define NULL ((void *)0)
-#endif
 
 enum {
 	false	= 0,

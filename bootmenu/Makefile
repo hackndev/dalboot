@@ -21,7 +21,7 @@ BigDAL-bm.prc: bootmenu.bin
 bootmenu.bin: bootmenu.elf
 	${OBJCOPY} -O binary bootmenu.elf bootmenu.bin
 
-bootmenu.elf: ${SRCS} bootmenu.lds bootmenu.h
+bootmenu.elf: ${SRCS} bootmenu.lds bootmenu.h debug
 	${CC} $(LDFLAGS) ${SRCS} ${LIBGCC} -o bootmenu.elf
 
 debug:
