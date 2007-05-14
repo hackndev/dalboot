@@ -22,8 +22,10 @@ bootmenu.bin: bootmenu.elf
 	${OBJCOPY} -O binary bootmenu.elf bootmenu.bin
 
 bootmenu.elf: ${SRCS} bootmenu.lds bootmenu.h
-	${CC} -S -fverbose-asm $(LDFLAGS) ${SRCS} > /dev/null
 	${CC} $(LDFLAGS) ${SRCS} ${LIBGCC} -o bootmenu.elf
+
+debug:
+	${CC} -S -fverbose-asm $(LDFLAGS) ${SRCS} > /dev/null
 
 clean:
 	rm -f bootmenu.bin bootmenu.elf BigDAL-bm.prc *.s
