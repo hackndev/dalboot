@@ -22,13 +22,14 @@ typedef struct PalmCardHeader {
 	u32 rw_working_sz;
 	u32 hal_os;
 	unsigned char pad[130];
-} PalmCardHeader;
+} __attribute__((packed)) PalmCardHeader;
 
 static PalmCardHeader *card;
 
 void init_palmcard()
 {
 	card = (PalmCardHeader*)(RAM_BASE + 0x200000);
+//	card = (PalmCardHeader*)malloc(sizeof(PalmCardHeader));
 	if (card->magic != 0xfeedbeef) {
 		printf("Palmcard not detected (magic=%lx)\n", card->magic);
 		card = NULL;

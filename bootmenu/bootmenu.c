@@ -27,6 +27,10 @@ void pxa_gpio_mode(int gpio_mode)
 	GAFR(gpio) = gafr |  (fn  << (((gpio) & 0xf)*2));
 }
 
+extern u32 _start;
+extern u32 _end;
+extern u32 _length;
+
 int main()
 {
 //	u32 machcode[2] = {0,0};
@@ -47,6 +51,9 @@ int main()
 	init_palmcard();
 	
 //	read_a_file("/linux.txt");
+
+	test_fat();
+	
 	
 	int k;
 	while (1) {
@@ -60,15 +67,6 @@ int main()
 }
 
 /**
- * Needed by libgcc for div by zero errors etc.
- */
-int raise(int sig)
-{
-	puts("libgcc error. div by zero?\n");
-	while(1);
-}
-
-/**
  * Copy bootmenu from wherever it currently is to the
  * _start location defined by the linker.
  *
@@ -76,14 +74,21 @@ int raise(int sig)
  * at and expects the final address of the main function
  * in return.
  */
-extern u32 _start;
-extern u32 _end;
 void *relocate_bootmenu(u32 *src)
 {
 	u32 *dest=&_start;
 	while (dest < &_end)
 		*(dest++) = *(src++);
 	return &main;
+}
+
+/**
+ * Needed by libgcc for div by zero errors etc.
+ */
+int raise(int sig)
+{
+	puts("libgcc error. div by zero?\n");
+	while(1);
 }
 
 /**
@@ -95,12 +100,17 @@ void * cheap_malloc(int bytes)
 {
 //	print ( "cheapo_malloc(): " );
 	if ( !sbrk ) sbrk = (void *)&_end+0;
-	printf ("sbrk=%lx\n",(u32)sbrk);
+	printf ("sbrk=%lx->",(u32)sbrk);
 	void * val = sbrk;
 	int tmp;
 	for(tmp=0;tmp<bytes;tmp++)
+	{
+//		printf("%lx %x\n",(u32)sbrk,tmp);
+//		print(".");
 		*((int*)(sbrk+tmp)) = 0;
+	}
 	sbrk+=bytes;
+	printf("%lx\n",(u32)sbrk);
 	return val;
 }
 

@@ -2,6 +2,7 @@
 //#define _BOOTMENU_H_
 
 #include "stddef.h"
+#include "fs/drive.h"
 
 #define RAM_BASE 0xa0000000
 
@@ -54,12 +55,12 @@ void wait_input();
 /* palmcard.c */
 void init_palmcard();
 
-/* ide.c 
-void init_ide();
-int fdc_fdos_read(void *buffer, int len);
-int fdc_fdos_seek(int where);
-void read_a_file(char * name);
-*/
+/* drive.c */
+//void init_drive();
+//void test_drive();
+//int fdc_fdos_read(void *buffer, int len);
+//int fdc_fdos_seek(int where);
+//void read_a_file(char * name);
 
 /* io-readsw-armv4.S */
 void _readsw(const void *addr, void *data, int wordlen);
