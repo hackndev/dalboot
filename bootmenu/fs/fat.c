@@ -14,10 +14,12 @@
 
 #include "fat.h"
 
-sector_buffer * sect_buf;
 u16 first_data_sector;
 u8 cluster_size_shift;
 u8 sector_size_shift;
+
+sector_buffer * sect_buf;
+bootsector * boot;
 
 
 u32 cluster_to_sector(u32 cluster)
@@ -73,7 +75,7 @@ char * shortname(char * name)
 	char * shortname = (char *)malloc(11);
 	u8 s,j,last_period=0;
 	//get first 8
-	for(s=0,j=0;s<8,name[j]!=0x00;s++,j++)
+	for(s=0,j=0;s<8 && name[j]!=0x00;s++,j++)
 	{
 	//change invalid to _
 		switch(name[j])
@@ -108,10 +110,10 @@ char * shortname(char * name)
 	//get extension
 	for(;name[j]!=0x00;j++)
 	{
-		if(name[j]==".") last_period=j;
+		if(name[j]=='.') last_period=j;
 	}
 
-	for(s=8,j=last_period;s<11,name[j]!=0x00;s++,j++)
+	for(s=8,j=last_period;s<11 && name[j]!=0x00;s++,j++)
 	{
 		switch(name[j])
 		{
@@ -145,7 +147,7 @@ FILE * fat32_open_file(char * name)
 	//parse name for directory
 	char * path;
 	basename(&name,&path); //sets name and path to "path0x0name" where the last / becomes 0x0
-	char * shortname = shortname(name);
+	char * short_name = shortname(name);
 	//go through FAT32 for the directory
 	replace_slashes(path);
 	
@@ -284,7 +286,6 @@ typedef union {
 
 void view_bootsector()
 {
-	bootsector * boot;
 	fat_fs_info * fs_info;
 
 	sect_buf = (sector_buffer *)malloc(sizeof(sector_buffer));
