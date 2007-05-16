@@ -46,6 +46,20 @@ void draw_char(unsigned int c, u32 x, u32 y)
 	}
 }
 
+void printf_ch_bin(u8 bin)
+{
+	u8 n;
+	for(n=0; n<8; n++)
+	{
+		if(bin & 0x1)	print("1");
+		else		print("0");
+		if (n==3)	print(" "); // groups of 4
+
+		bin >>= 1;
+	}
+}
+
+
 int putchar(int c)
 {
 	switch (c) {

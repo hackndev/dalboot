@@ -5,7 +5,6 @@ typedef unsigned long u32;
 typedef unsigned short u16;
 typedef unsigned long size_t;
 typedef unsigned char u8;
-typedef __WCHAR_TYPE__ wchar_t;
 
 #define NULL ((void *)0)
 

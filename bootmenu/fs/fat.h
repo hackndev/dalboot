@@ -53,7 +53,7 @@ typedef struct
 {
 	u8 name[11];			/* 0  Short name				*/
 	u8 attribs;			/* 11 Attributes				*/
-	u8 reserved_nt;			/* 12 Reserved for NT...again			*/
+	u8 lower_case;			/* 12 Reserved for NT...NOT! Shows case		*/
 	u8 crtd_time_tenth;		/* 13 Tenths of seconds, 0-199 for creation	*/
 	u16 crtd_time;			/* 14 Time of creation				*/
 	u16 crtd_date;			/* 16 Date of creation				*/
@@ -83,3 +83,11 @@ typedef union
 	u16 data16[256];		/* 16 bit buffer version.			*/
 	u32 data32[128];		/* 32 bit version. Useful for FAT entries	*/
 } sector_buffer;
+
+typedef struct
+{
+	u32 dir_cluster;		/* Cluster to find file's entry in		*/
+	u8 entry_in_dir;		/* Offset (1-15) to first entry regarding file
+					    Points to first long entry, if exists.
+					    Otherwise points to short entry.		*/
+} FILE;

@@ -9,9 +9,9 @@ static void * sbrk = NULL;
 void * cheap_malloc(int bytes)
 {
 //	print ( "cheapo_malloc(): " );
-	printf("sbrk=%lx->",(u32)sbrk);
+//	printf("sbrk=%lx->",(u32)sbrk);
 //	if ( !sbrk ) sbrk = (void *)&_end;
-	printf ("%lx->",(u32)sbrk);
+//	printf ("%lx->",(u32)sbrk);
 	void * val = sbrk;
 	int tmp;
 	for(tmp=0;tmp<bytes;tmp++)
@@ -21,7 +21,7 @@ void * cheap_malloc(int bytes)
 		*((int*)(sbrk+tmp)) = 0;
 	}
 	sbrk+=bytes;
-	printf("%lx\n",(u32)sbrk);
+//	printf("%lx\n",(u32)sbrk);
 	return val;
 }
 
@@ -174,6 +174,6 @@ void readsw(const void *a, void *b, int c)
 	SET_PALMLD_GPIO(GREEN_LED, 0);
 	SET_PALMLD_GPIO(ORANGE_LED, 1);
 	_readsw(a,b,c);
-	SET_PALMLD_GPIO(GREEN_LED, 1);
 	SET_PALMLD_GPIO(ORANGE_LED, 0);
+//	SET_PALMLD_GPIO(GREEN_LED, 1);
 }

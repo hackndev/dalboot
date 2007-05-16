@@ -9,6 +9,7 @@
 /* video.c */
 void fill_screen(u16 color);
 void init_video();
+void printf_ch_bin(u8 bin);
 int putchar(int c);
 int puts(const char *s);
 int printf(const char *fmt, ...);
