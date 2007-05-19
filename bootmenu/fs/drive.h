@@ -15,6 +15,7 @@ void read_sector(u32 start, void * buf);
 /* fat.c */
 void view_mbr();
 void view_bootsector();
+void test_fs_driver();
 
 /* IDE registers */
 #define IDE_DATA        0

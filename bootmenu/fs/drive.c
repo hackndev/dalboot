@@ -98,5 +98,6 @@ void test_fat()
 	//test_drive();
 	//identify();
 	//view_mbr();
-	view_bootsector();
+	//view_bootsector();
+	test_fs_driver();
 }

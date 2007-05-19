@@ -2,9 +2,6 @@
 #define _LINUX_STRING_H_
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 typedef unsigned long __kernel_size_t;
 typedef unsigned long gfp_t;
 extern char *strndup_user(const char  *, long);
@@ -52,9 +49,11 @@ extern char * strstr(const char *,const char *);
 #ifndef __HAVE_ARCH_STRLEN
 extern __kernel_size_t strlen(const char *);
 #endif
+
 #ifndef __HAVE_ARCH_STRNLEN
 extern __kernel_size_t strnlen(const char *,__kernel_size_t);
 #endif
+
 #ifndef __HAVE_ARCH_STRPBRK
 extern char * strpbrk(const char *,const char *);
 #endif
@@ -90,8 +89,5 @@ extern void * memchr(const void *,int,__kernel_size_t);
 extern char *kstrdup(const char *s, gfp_t gfp);
 extern void *kmemdup(const void *src, size_t len, gfp_t gfp);
 
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _LINUX_STRING_H_ */

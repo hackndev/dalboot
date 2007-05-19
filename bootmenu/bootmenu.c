@@ -68,8 +68,9 @@ int main()
 	u32 cpu = get_cpu();
 	printf("[CPU] %s %s\n", get_cpu_vendor(cpu), get_cpu_name(cpu));
 	
-	printf("_start: %lx\n_end: %lx\nsbrk: %lx",(u32)&_start,(u32)&_end,(u32)sbrk);
+	printf("_start: %lx\n_end: %lx\nsbrk: %lx\n",(u32)&_start,(u32)&_end,(u32)sbrk);
 	sbrk = (void *)&_end;
+	printf("sbrk: %lx\n",(u32)sbrk);
 
 	//machcode[0] = get_rom_mach();
 	//printf("[MACH] %s\n", (char*)machcode);

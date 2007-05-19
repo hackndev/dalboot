@@ -1,7 +1,10 @@
 #include "../bootmenu.h"
 
 #define GCC_OPTION(x) __attribute__ ((x))
-#define ENTRY_FIRST_CLUSTER(x) ((u32)x->first_clust_hi<<16) + x->first_clust_lo
+#define ENTRY_FIRST_CLUSTER(x) (((u32)x->first_clust_hi<<16) + x->first_clust_lo)
+
+#define PRINTF(fmt,args...)	printf (fmt ,##args)
+#define PRINT(fmt)		print(fmt)
 
 typedef struct
 {
@@ -87,7 +90,8 @@ typedef union
 typedef struct
 {
 	u32 dir_cluster;		/* Cluster to find file's entry in		*/
-	u8 entry_in_dir;		/* Offset (1-15) to first entry regarding file
+	u8 sector_offset;		/* Offset (0-31) to sector in cluster		*/
+	u8 entry_offset;		/* Offset (0-15) to first entry regarding file
 					    Points to first long entry, if exists.
 					    Otherwise points to short entry.		*/
 } FILE;

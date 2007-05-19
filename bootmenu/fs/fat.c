@@ -42,7 +42,7 @@ void read_fat_entry(u32 sector, u32 offset, u32 * buffer)
 	*buffer = (sect_buf->data32[offset>>5]) &0x0FFFFFFF;
 }
 
-void uppercase(char * name)
+void uppercase(u8 * name)
 {
 	while(*name!=0x00)
 	{
@@ -52,16 +52,19 @@ void uppercase(char * name)
 	}
 }
 
-void basename(char * * name, char * * path)
+void basename(u8 * * name, u8 * * path)
 {
 	//find last slash and set it to 0x0
 	//set name to point after slash
-	char * last_slash = *name;
+	u8 * last_slash = *name;
 	*path = *name;
 
+//	PRINTF("Finding basename of %s\n",*name);
 	while(**name!=0x0)
 	{
+//		PRINTF("%x:%c::",**name,**name);
 		if(**name=='/') last_slash=*name;
+		(*name)++;
 	}
 
 	*last_slash='\0';
@@ -70,10 +73,43 @@ void basename(char * * name, char * * path)
 	return;
 }
 
-char * shortname(char * name)
+u8 * shortname(u8 * name)
 {
-	char * shortname = (char *)malloc(11);
-	u8 s,j,last_period=0;
+	u8 * ext=0;
+	u8 i,j=0;
+	//set ext to last period
+	for(i=0;name[i]!=0x00;i++) if(name[i]=='.') ext=&name[i];
+	//set last period to null, so name ends with a null before the extension
+	*ext=0x00;
+	//ext now points to extension
+	ext++;
+
+	u8 * shortname = (u8 *)malloc(11);
+
+	//copy anything over until the first space
+	for (i=0;(name[i]!=' ') && (i<8);i++) shortname[i]=name[i];
+
+	//copy over extension
+	if (ext && ext[0]!=' ')
+	{
+		while(ext && j++<3) shortname[8+j]=ext[j];
+	}
+	
+	//I really don't think this works.....
+	//Maybe if I add the ext thing to the algorithm below?
+	return shortname;
+}
+
+
+
+
+
+/*	u8 s,j,last_period=0;
+
+	//Set last period to 0x00 so that we only include it once.
+	for(s=0; name[s]!=0x00; s++) if(name[s]=='.') last_period=j;
+	if(last_period) name[last_period] = 0x00;
+
 	//get first 8
 	for(s=0,j=0;s<8 && name[j]!=0x00;s++,j++)
 	{
@@ -81,7 +117,8 @@ char * shortname(char * name)
 		switch(name[j])
 		{
 		case '.':
-			last_period=j;
+//			last_period=j;
+			break;
 		case ' ':
 			s--;
 			continue;
@@ -93,7 +130,7 @@ char * shortname(char * name)
 		else if(name[j]>='A' && name[j] <= 'Z')
 			shortname[s] = name[j];
 		else
-			s--;
+			shortname[s] = '_';
 	}
 		//if more than 8
 	if(s==8 && name[j]!= 0x00 && name[j+1]!=0x00)
@@ -132,51 +169,147 @@ char * shortname(char * name)
 	if(s<11) for(;s<11;s++) shortname[s]=' ';
 	return shortname;
 }
+*/
 
-void replace_slashes(char * path) //replaces all forward slashes (/) with 0x0
+void replace_slashes(u8 * path) //replaces all forward slashes (/) with 0x0
 {
-	for(;path!=0x0;path++)
+	for(;*path!=0x0;path++)
 	{
 		if(*path=='/') *path=0x00;
 	}
 }
 
-FILE * fat32_open_file(char * name)
+u8 fat_strcmp(u8 * str1, u8 * str2)
 {
+//	for(;*str1!=0x0 && *str2!=0x00 && *str1==*str2;str1++,str2++);
+	while(*str1!=0x0 && *str2!=0x0)
+	{
+		if(*str1 != *str2) return str1-str2;
+		str1++; str2++;
+	}
+	if(*str1) return -(*str2);
+	else return *str1;
+		
+}
+
+u8 fat_strlen(u8 * str)
+{
+	u8 len=0;
+	while(*str != 0x00) {PRINTF("%c:",*str); len++;}
+	return len;
+}
+
+FILE * fat32_open_file(u8 * name)
+{
+	FILE * file_handle;
+
 //	uppercase(name);
 	//parse name for directory
-	char * path;
+	u8 * path;
+
+	PRINTF("Finding basename of %s\n",name);
 	basename(&name,&path); //sets name and path to "path0x0name" where the last / becomes 0x0
-	char * short_name = shortname(name);
+	PRINTF("The path is %s and the name is %s\n",path,name);
+//	char * short_name = shortname(name);
 	//go through FAT32 for the directory
+	PRINT("Replacing slashes in path\n");
 	replace_slashes(path);
+	PRINTF("Path without slashes: %s\n",path);
 	
+	//first name starts at 1
+	path++;
+	PRINTF("Path without slashes and skipping the first byte: %s\n",path);
+
+	u8 entry_offset=0,cur_sec=0;
+	u32 cluster=2;
 	//loop through each directory
-		//first string starts at 1
+	while(path<=name)
+	{
+		//test should fail when path>name
+
+		//loop through directory linked-list
+		u32 sector,offset,entry;
+		cluster=boot->root_cluster;
+
+		PRINTF("Finding entry of cluster %ld:\n",cluster);
+		cluster_to_entry(cluster, &sector, &offset);
+		PRINTF("\tSector: %ld\n",sector);
+		PRINTF("\tOffset: %ld\n",offset);
+
+		read_fat_entry(sector, offset, &entry);
+		PRINTF("\tEntry: %ld\n",entry);
+
+		do	//while(entry<0x0ffffff8)	//until entry >= 0ffffff8
+		{
+			//loop through sectors of directory for next place in path (path+strlen(path)+1)
+			PRINTF("Cluster size: %d\n",boot->cluster_size);
+
+			for(cur_sec=0; cur_sec<boot->cluster_size; cur_sec++)
+			{
+				PRINTF("Current sector: %d\n",cur_sec);
+
+				//test against short name
+				read(cluster_to_sector(cluster)+cur_sec,1,sect_buf);
+				fat_dir_entry * dir_entry = (fat_dir_entry *)sect_buf;
+				//loop through directory entries
+				for(entry_offset=0;entry_offset<16;entry_offset++)
+				{
+					if(dir_entry[entry_offset].attribs == 0x0f) continue;
+					if(dir_entry[entry_offset].name[0] == 0xE5) continue;
+					if(dir_entry[entry_offset].name[0] == 0x00) goto failed;
+
+					PRINTF("Read directory entry %d:\n",entry_offset);
+					PRINTF("\tName: %.11s\n",dir_entry[entry_offset].name);
+					PRINTF("\tAttribs: %x\n",dir_entry[entry_offset].attribs);
+
+					u8 * short_dir_name = shortname(path);
+					PRINTF("Short name of %s is %s\n",path,short_dir_name);
+					if(fat_strcmp(dir_entry[entry_offset].name,short_dir_name)==0)
+					{
+						if(path==name)
+							goto found_name;
+						else
+							goto found_path;
+					}
+//					if(strcmp(dir_entry[entry_offset].name,short_name)==0) goto found_file;
+				}
+			}
+
+found_path:
+			
+			//read next cluster
+			cluster=entry;
+			cluster_to_entry(entry, &sector, &offset);
+			read_fat_entry(sector, offset, &entry);	
+
+		} while(entry<0x0ffffff8);
+
 		//at the end, set path to (path+strlen(path)+1)
-		//test should fail when path==name
+		path += fat_strlen(path) + 1;
 
-	//loop through directory entries
-		//until entry > fffffff8
-
-	//loop through sectors of directory for next place in path (path+strlen(path)+1)
-		//test against short name
-
-
-
+	}
 	
-
-	//save the cluster of the directory that the last one was found it
-		//and where it was found into the FILE handle
-
+	//We failed looking for the file...
+failed:
 	return 0;
+
+found_name:
+
+	file_handle = (FILE *)malloc(sizeof(FILE));
+	//save the cluster of the directory that the last one was found it
+	file_handle->dir_cluster = cluster;
+		//and where it was found into the FILE handle
+	file_handle->sector_offset = cur_sec;
+	file_handle->entry_offset = entry_offset;
+
+	return file_handle;
 }
 
 void fat32_init()
 {
 	sect_buf = (sector_buffer *)malloc(sizeof(sector_buffer));
 	boot = (bootsector *)malloc(sizeof(bootsector));
-	read(0,1,boot);
+	read(0,1,boot); //the rest gets zeroed with next malloc
 
 	first_data_sector = boot->reserved_sectors + boot->num_fat * boot->fat_size;
 
@@ -209,10 +342,10 @@ typedef struct {
 
 typedef struct {
 	u8 booter[0x1be];
-	Partition pentry[4] GCC_OPTION(packed);
+	Partition pentry[4];
 	u8 magic1; /* 0xaa */
 	u8 magic2; /* 0x55 */
-} PartitionTable;
+} GCC_OPTION(packed) PartitionTable;
 
 
 union MBRData
@@ -392,14 +525,14 @@ void view_bootsector()
 	
 	u32 i=0,a=0;
 	u8 sect;
-	char * long_entry_name=0;
+	u8 * long_entry_name=0;
 	for(sect=0;sect<32;sect++)
 	{
 		printf("Reading sector %d:\n",sect);
 		read(cluster_to_sector(boot->root_cluster)+sect,1,sect_buf);
 		fat_dir_entry * dir = (fat_dir_entry *)sect_buf;
 	
-		char name[13];
+		u8 name[13];
 		for(i=0;i<16;i++)
 		{
 			if(dir[i].name[0]==0x00) goto last_entry;
@@ -432,7 +565,7 @@ void view_bootsector()
 				{
 					//print("First long entry");
 					long_name->ordinal^=0x40;
-					long_entry_name = (char *)malloc(13*long_name->ordinal+1);
+					long_entry_name = (u8 *)malloc(13*long_name->ordinal+1);
 					long_entry_name[13*long_name->ordinal] = 0x0;
 				}
 				//printf("Long entry %d:\n",long_name->ordinal);
@@ -469,4 +602,23 @@ last_entry:
                 printf("%x ", boot->data[i]);
         print("\n");
 */
+}
+
+
+void test_fs_driver()
+{
+	print("Initializing fat32 driver...\n");
+	fat32_init();
+	print("Initialization worked.\n");
+	u8 * name = (u8 *)"/linux.txt";
+	printf("Opening %s:\n",name);
+	FILE * file = fat32_open_file(name);
+	if(file) {
+		print("Whooo! It worked!\n");
+		printf("\tDirectory cluster: %ld\n",file->dir_cluster);
+		printf("\tSector offset: %d\n",file->sector_offset);
+		printf("\tEntry offset: %d\n",file->entry_offset);
+	}else{
+		printf("We failed while opening %s...weird\n",name);
+	}
 }
