@@ -43,7 +43,7 @@ static void read_sectors(u32 start, int count, void *buf)
                 printf("Count: %d\n", i);
                 if (io_reg[IDE_STATUS] & STATUS_DRQ) {
                         print ("io_reg[IDE_STATUS] is good\n");
-                        readsw((void*)io_reg + IDE_DATA, buf+512*i, 256);
+                        readsw((void*)io_reg + IDE_DATA, buf+SECTOR_SIZE*i, 256);
                 } else {
                         puts("Read error\n");
                 }
@@ -66,6 +66,61 @@ void read_sector(u32 start, void * buf)
         read_sectors(start, 1, buf);
 }
 
+/*
+ * Buffering of reads from hard drive
+ * Useful for FAT32 driver's consistent reading
+ *  from the drive
+ */
+
+#define NUM_BUFS 4
+u8 buffered_sectors_data[NUM_BUFS][SECTOR_SIZE];
+u32 buffered_sectors[NUM_BUFS];
+int last_buf_used=-1;
+
+void buffered_read(u32 start, int count, void * buf)
+{
+	int * to_be_read = (int *)(malloc(count * (sizeof (int))));
+	int read_needed=0;
+	int cursec;
+	for(cursec=0; cursec<count; cursec++)
+	{
+		int curbuf;
+		for(curbuf=0;curbuf<NUM_BUFS; curbuf++)
+		{
+			if(start + cursec == buffered_sectors[curbuf])
+			{
+				int i;
+				for(i=0;i<SECTOR_SIZE; i++) ((u8 *)buf)[cursec*SECTOR_SIZE+i]=buffered_sectors_data[curbuf][i];
+
+				last_buf_used=curbuf;
+				if(last_buf_used==NUM_BUFS-1) last_buf_used=-1;
+			}else{
+				to_be_read[read_needed++]=cursec;
+			}
+		}
+	}
+
+	//now read the sectors not found in the buffer
+	for(cursec=0;cursec<read_needed;cursec++)
+	{
+		int num_inarow=0;
+		while(to_be_read[cursec+1]==to_be_read[cursec]+1) //the next to_be_read is the next sector
+		{
+			if(num_inarow+cursec+1<NUM_BUFS) //if we have room
+				num_inarow++;
+			else			//out of room in buffer
+				break;
+		}
+		read(to_be_read[cursec]+start,num_inarow,buffered_sectors_data[cursec]);
+		
+		buffered_sectors[cursec]=to_be_read[cursec]+start;
+
+		int i;
+		for(i=0;i<SECTOR_SIZE; i++) ((u8 *)buf)[to_be_read[cursec]*SECTOR_SIZE+i]=buffered_sectors_data[cursec][i];
+	}
+
+	
+}
 
 
 void init_drive()
@@ -82,12 +137,12 @@ void test_drive()
                 cardinfo.cyls*cardinfo.heads*cardinfo.sectors/1024/2,
                 cardinfo.cyls, cardinfo.heads, cardinfo.sectors,
                                                 cardinfo.model);
-        u8 mbr[512];
+        u8 mbr[SECTOR_SIZE];
         /* read master boot record */
         read_sectors(0, 1, mbr);
         printf("MBR: ");
         int i;
-        for (i=0x1be; i<512; i++)
+        for (i=0x1be; i<SECTOR_SIZE; i++)
                 printf("%x ", mbr[i]);
         print("\n");
 	wait_input();

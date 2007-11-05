@@ -17,6 +17,8 @@ void view_mbr();
 void view_bootsector();
 void test_fs_driver();
 
+#define SECTOR_SIZE 512
+
 /* IDE registers */
 #define IDE_DATA        0
 #define IDE_ERRPR       1       /* W: Features */

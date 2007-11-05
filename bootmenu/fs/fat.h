@@ -1,10 +1,16 @@
 #include "../bootmenu.h"
 
 #define GCC_OPTION(x) __attribute__ ((x))
-#define ENTRY_FIRST_CLUSTER(x) (((u32)x->first_clust_hi<<16) + x->first_clust_lo)
+#define ENTRY_FIRST_CLUSTER(x) (((u32)(x)->first_clust_hi<<16) + (x)->first_clust_lo)
 
+#define DEBUG
+#ifdef DEBUG
 #define PRINTF(fmt,args...)	printf (fmt ,##args)
 #define PRINT(fmt)		print(fmt)
+#else
+#define PRINTF(fmt,args...)
+#define PRINT(fmt)
+#endif
 
 typedef struct
 {
@@ -64,7 +70,7 @@ typedef struct
 	u16 first_clust_hi;		/* 20 High word of first cluster		*/
 	u16 wrtn_time;			/* 22 Time of last write			*/
 	u16 wrtn_date;			/* 24 Date of last write			*/
-	u16 first_clust_lo;		/* 26 Low work of first cluster			*/
+	u16 first_clust_lo;		/* 26 Low word of first cluster			*/
 	u32 file_size;			/* 28 File size in bytes			*/
 } GCC_OPTION(packed) fat_dir_entry;
 
@@ -89,9 +95,7 @@ typedef union
 
 typedef struct
 {
-	u32 dir_cluster;		/* Cluster to find file's entry in		*/
-	u8 sector_offset;		/* Offset (0-31) to sector in cluster		*/
-	u8 entry_offset;		/* Offset (0-15) to first entry regarding file
-					    Points to first long entry, if exists.
-					    Otherwise points to short entry.		*/
-} FILE;
+	fat_dir_entry * entry;		/* A copy of this file's entry			*/
+	u8 * path;			/* The path leading up to this file('/'='\0')	*/
+	u8 * name;			/* Points to part of path that indicates name	*/
+} GCC_OPTION(packed) FILE;
