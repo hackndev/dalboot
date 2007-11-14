@@ -16,12 +16,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
  * MA 02111-1307 USA
- */
-
-/*
+ *
+ *
  * This is a simple FAT32 driver.
  *
- * Created for Hackndev. Intended for the Palm LifeDrive.
+ * Created for Hackndev; Intended for the Palm LifeDrive.
+ * Meant to be easily ported to other devices.
  *
  * Replace drive.c functions with other, direct-access functions
  * if you want to access a different FAT32 filesystem.

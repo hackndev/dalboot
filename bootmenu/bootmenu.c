@@ -104,9 +104,15 @@ int main()
  */
 void *relocate_bootmenu(u32 *src)
 {
+	u32 * orig_src = src;
 	u32 *dest=&_start;
 	while (dest < &_end)
 		*(dest++) = *(src++);
+
+	//Seems like our code is called when POS goes to sleep
+	//Lets set the branch to our code to a 0.
+	*orig_src=0;
+
 	return &main;
 }
 

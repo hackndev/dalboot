@@ -919,7 +919,7 @@ void test_fs_driver()
 	PRINT("Initializing fat32 driver...\n");
 	fat32_init();
 	PRINT("Initialization worked.\n");
-	u8 * name = (u8 *)("/cocoboot.conf");
+	u8 * name = (u8 *)("/dalboot.conf");
 	PRINTF("\n--Opening %s:\n",name);
 	FILE * file = fat32_open_file(name);
 	if(file) {
