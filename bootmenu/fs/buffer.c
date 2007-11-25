@@ -8,7 +8,7 @@
 
 #include "buffer.h"
 
-//local methods declarations
+//local method declarations
 u8 bfr_have_sector(u32 sector);
 void bfr_fill_from(u8 which, u8 * buf);
 u8 bfr_get(u32 sector);
@@ -41,7 +41,8 @@ void bfr_read(u32 start, int count, void * buf)
 	{
 		//bfr_get them
 		//bfr_fill_from them next
-		bfr_fill_from(bfr_get(start+cur_buf),(buf+(cur_buf<<9)));
+		if(needed[cur_buf]!=(u8)-1)
+			bfr_fill_from(bfr_get(start+cur_buf),(buf+(cur_buf<<9)));
 	} while(cur_buf-->0);
 
 
