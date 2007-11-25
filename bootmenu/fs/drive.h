@@ -97,3 +97,46 @@ typedef struct IdentifySector {
 	u8 padding[186];
 } __attribute__((packed)) IdentifySector;
 #endif
+
+typedef union
+{
+        u8 data[512];                   /* Buffer for reading a whole sector at a time  */
+        u16 data16[256];                /* 16 bit buffer version.                       */
+        u32 data32[128];                /* 32 bit version. Useful for FAT entries       */
+} sector_buffer;
+
+#ifdef FAT_FUNCS
+u8 fat_strcmp(u8 * str1, u8 * str2)
+{
+//      for(;*str1!=0x0 && *str2!=0x00 && *str1==*str2;str1++,str2++);
+        while(*str1!=0x0 && *str2!=0x0)
+        {
+                if(*str1 != *str2) return str1-str2;
+                str1++; str2++;
+        }
+        if(*str1) return -(*str2);
+        else return *str1;
+
+}
+
+u8 fat_strlen(u8 * str)
+{
+        u8 len=0;
+        while(str[len] != 0x00) {PRINTF("%c:",str[len]); len++;}
+        //while(str[len]!=0x00) { len++; }
+        return len;
+}
+
+void fat_memcpy(void * dst,void * src,u32 len)
+{
+        if(len<=0) return;
+        u8 * d=(u8 *)dst;
+        u8 * s=(u8 *)src;
+        while(len--) *(d++) = *(s++);
+}
+#else
+#include "../string.h"
+#define fat_strcmp(x,y) (u8)(strcmp( (const char*)(x), (const char*)(y)))
+#define fat_strlen(x) (u8)(strlen( (const char*)(x) ))
+#define fat_memcpy(x,y,z) memcpy(x,y,z)
+#endif

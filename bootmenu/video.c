@@ -38,7 +38,7 @@ void draw_char(unsigned int c, u32 x, u32 y)
 	for (row=0; row < FONT_ROWS; row++) {
 	for (col=0; col < FONT_COLS; col++) {
 		if (font_entry((FONT_ROWS*c)+row) & (1<<(7-col))) {
-			PIXEL(x+col, y+row) = 0xff00;
+			PIXEL(x+col, y+row) = RGB16(31,63,31);//0xff00;
 		} else {
 			PIXEL(x+col, y+row) = 0x0;
 		}

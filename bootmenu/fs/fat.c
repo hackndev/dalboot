@@ -39,7 +39,7 @@ void cluster_to_entry(u32 cluster, u32 * sector, u32 * entry_offset)
 
 void read_fat_entry(u32 sector, u32 offset, u32 * buffer)
 {
-	read(sector,1,sect_buf);
+	bfr_read(sector,1,sect_buf);
 	*buffer = (sect_buf->data32[offset>>5]) &0x0FFFFFFF;
 }
 
@@ -82,51 +82,6 @@ void replace_slashes(u8 * path) //replaces all forward slashes (/) with 0x0
 	{
 		if(*path=='/') *path=0x00;
 	}
-}
-
-u8 fat_strcmp(u8 * str1, u8 * str2)
-{
-//	for(;*str1!=0x0 && *str2!=0x00 && *str1==*str2;str1++,str2++);
-	while(*str1!=0x0 && *str2!=0x0)
-	{
-		if(*str1 != *str2) return str1-str2;
-		str1++; str2++;
-	}
-	if(*str1) return -(*str2);
-	else return *str1;
-		
-}
-
-u8 fat_strlen(u8 * str)
-{
-	u8 len=0;
-	while(str[len] != 0x00) {PRINTF("%c:",str[len]); len++;}
-	//while(str[len]!=0x00) { len++; }
-	return len;
-}
-
-void fat_memcpy(void * dst,void * src,u32 len)
-{
-	if(len<=0) return;
-/*
-	register char * d;
-	register char * s;
-
-	d=(char *)dst;
-	s=(char *)src;
-
-	while(len>=4)
-	{
-		*d++ = *s++;
-		*d++ = *s++;
-		*d++ = *s++;
-		*d++ = *s++;
-		len-=4;
-	}
-*/
-	u8 * d=(u8 *)dst;
-	u8 * s=(u8 *)src;
-	while(len--) *(d++) = *(s++);
 }
 
 /* Attempt #2 at opening a file
@@ -590,6 +545,7 @@ u32 fat32_read_file(FILE * file, u32 start, u32 length, u8 * buffer)
 	u32 orig_length=length;
 	u32 cur_cluster = ENTRY_FIRST_CLUSTER(file->entry);
 
+	//Basically seeking to the right cluster
 	u32 entry_sector,entry_offset;
 	while(start>(boot->cluster_size<<sector_size_shift)) //means we gotta go to the next cluster
 	{
@@ -599,13 +555,19 @@ u32 fat32_read_file(FILE * file, u32 start, u32 length, u8 * buffer)
 		cluster_to_entry(cur_cluster,&entry_sector,&entry_offset); //go to next entry
 		read_fat_entry(entry_sector,entry_offset,&cur_cluster); // read entry
 	}
+
+	//now seek to the right cluster
+	u8 cur_sec=0;
+	for(;cur_sec<boot->cluster_size && start>(1<<sector_size_shift);cur_sec++)
+		start-=1<<sector_size_shift;
+	//start reading
 	while(cur_cluster<0x0ffffff8 && length>0)
 	{
-		u8 cur_sec=0;
 		for(;cur_sec<boot->cluster_size && length>0;cur_sec++)
 		{
 			read(cluster_to_sector(cur_cluster)+cur_sec,1,sect_buf);
 			u16 cur_byte=0;
+			while(start-->0)cur_byte++; //seek to the right byte
 			for(;cur_byte<boot->sector_size && length>0;cur_byte++)
 			{
 				buffer[cur_byte+(cur_sec<<sector_size_shift)]=sect_buf->data[cur_byte];
@@ -616,6 +578,7 @@ u32 fat32_read_file(FILE * file, u32 start, u32 length, u8 * buffer)
 		//set things to the next cluster and continue reading
 		cluster_to_entry(cur_cluster,&entry_sector,&entry_offset);
 		read_fat_entry(entry_sector,entry_offset,&cur_cluster);
+		cur_sec=0;
 	}
 	return orig_length-length;
 }
@@ -941,7 +904,10 @@ void test_fs_driver()
 	}
 	//file has returned, the file is found
 	//now read it...
-	u8 * buf = (u8 *)malloc(10);
-	u32 length_read = fat32_read_file(file,0,30,buf);
+	u8 * buf = (u8 *)malloc(50);
+	u32 length_read;
+	length_read = fat32_read_file(file,0,50,buf);
+	length_read = fat32_read_file(file,0,50,buf);
+	length_read = fat32_read_file(file,0,50,buf);
 	PRINTF("Read from the file\n\tHow much: %ld\n\tWhat we read: %s\n",length_read,buf);
 }

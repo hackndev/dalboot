@@ -1,4 +1,4 @@
-#include "../bootmenu.h"
+#include "buffer.h"
 
 #define GCC_OPTION(x) __attribute__ ((x))
 #define ENTRY_FIRST_CLUSTER(x) (((u32)(x)->first_clust_hi<<16) + (x)->first_clust_lo)
@@ -11,6 +11,8 @@
 #define PRINTF(fmt,args...)
 #define PRINT(fmt)
 #endif
+
+//#define FAT_FUNCS
 
 typedef struct
 {
@@ -85,13 +87,6 @@ typedef struct
 	u16 zero;			/* 26 First cluster. Should be 0		*/
 	u8 name3[4];			/* 28 Last 2 characters of name			*/
 } GCC_OPTION(packed) fat_long_name_entry;
-
-typedef union
-{
-	u8 data[512];			/* Buffer for reading a whole sector at a time	*/
-	u16 data16[256];		/* 16 bit buffer version.			*/
-	u32 data32[128];		/* 32 bit version. Useful for FAT entries	*/
-} sector_buffer;
 
 typedef struct
 {
