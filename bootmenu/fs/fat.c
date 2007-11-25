@@ -134,7 +134,7 @@ FILE * fat32_open_file(u8 * path)
 		for(cur_sector=0;cur_sector<boot->cluster_size;cur_sector++)
 		{
 			//PRINTF("Looking for %s in sector %d (%ld)\n",cur_dir,cur_sector,file_handle->dir_cluster);
-			read(cluster_to_sector(ENTRY_FIRST_CLUSTER(file_handle->entry))+cur_sector,1,sect_buf);
+			bfr_read(cluster_to_sector(ENTRY_FIRST_CLUSTER(file_handle->entry))+cur_sector,1,sect_buf);
 			entry = (fat_dir_entry *)sect_buf;
 			//loop through entries in this sector
 			//store long entries as they show up
