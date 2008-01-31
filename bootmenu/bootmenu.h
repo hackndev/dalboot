@@ -1,5 +1,5 @@
-//#ifndef _BOOTMENU_H_
-//#define _BOOTMENU_H_
+#ifndef _BOOTMENU_H_
+#define _BOOTMENU_H_
 
 #include "stddef.h"
 #include "fs/drive.h"
@@ -77,4 +77,4 @@ void readsw(const void *a, void *b, int c);
 /* machine init */
 void init_palmld();
 
-//#endif
+#endif

@@ -35,17 +35,17 @@ static void read_sectors(u32 start, int count, void *buf)
         io_reg[IDE_SELECT] = ((start >> 24) & 0xf) | 0xe0;
         io_reg[IDE_STATUS] = CMD_RD_SECTORS;
 
-        puts("waiting for busy\n");
+	//puts("waiting for busy\n");
         while (io_reg[IDE_STATUS] & STATUS_BSY); //LED is orange
 
-        puts("reading\n");
+	puts("reading\n");
         for (i=0; i<count; i++) {
-                printf("Count: %d\n", i);
+		printf("Count: %d\n", i);
                 if (io_reg[IDE_STATUS] & STATUS_DRQ) {
-                        print ("io_reg[IDE_STATUS] is good\n");
+			//print ("io_reg[IDE_STATUS] is good\n");
                         readsw((void*)io_reg + IDE_DATA, buf+SECTOR_SIZE*i, 256);
                 } else {
-                        puts("Read error\n");
+			puts("Read error\n");
                 }
         }
 

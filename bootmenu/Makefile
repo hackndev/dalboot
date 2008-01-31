@@ -6,13 +6,13 @@ LDFLAGS=-nostdlib -Wall -pipe -Tbootmenu.lds
 
 SRCS=start.S bootmenu.c font.S video.c mach.c vsprintf.c string.c ctype.c \
 	div64.S keypad.c palmcard.c palmld.c io-readsw-armv4.S \
-	fs/drive.c  fs/fat.c fs/buffer.c
+	fs/drive.c fs/fat.c fs/cache.c
 
 LIBGCC=-lgcc
 
 ASMS=start.S bootmenu.s font.S video.s mach.s vsprintf.s string.s ctype.s \
 	div64.S keypad.s palmcard.s palmld.s io-readsw-armv4.S \
-	drive.s  fat.s buffer.s
+	drive.s fat.s cache.s
 
 ASMLIBGCC=/usr/lib/gcc/arm-softfloat-linux-gnu/4.1.1/libgcc.a
 
@@ -40,6 +40,7 @@ clean:
 
 
 asm: debug BigDAL-bm-asm.prc zImage-asm
+	mv BigDAL-bm-asm.prc BigDAL-bm.prc
 
 zImage-asm: bootmenu-asm.bin
 	cp bootmenu-asm.bin zImage-asm

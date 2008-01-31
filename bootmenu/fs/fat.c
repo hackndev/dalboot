@@ -39,7 +39,7 @@ void cluster_to_entry(u32 cluster, u32 * sector, u32 * entry_offset)
 
 void read_fat_entry(u32 sector, u32 offset, u32 * buffer)
 {
-	bfr_read(sector,1,sect_buf);
+	cache_read(sector,1,sect_buf);
 	*buffer = (sect_buf->data32[offset>>5]) &0x0FFFFFFF;
 }
 
@@ -102,7 +102,7 @@ FILE * fat32_open_file(u8 * path)
 	file_handle->path=(u8 *)malloc(fat_strlen(path)+1);
 	fat_memcpy(file_handle->path,path,fat_strlen(path)+1);
 	file_handle->name=basename(file_handle->path);
-	PRINTF("file_handle:\n\tpath: %s, name: %s",file_handle->path,file_handle->name);
+	PRINTF("file_handle:\n\tpath: %s, name: %s\n",file_handle->path,file_handle->name);
 
 	name = basename(path);
 
@@ -118,7 +118,7 @@ FILE * fat32_open_file(u8 * path)
 	file_handle->entry = (fat_dir_entry *)malloc(sizeof(fat_dir_entry));
 	file_handle->entry->first_clust_lo=(boot->root_cluster)&0x0000FFFF;
 	file_handle->entry->first_clust_hi=(boot->root_cluster)&0xFFFF0000;
-	PRINTF("entry: %ld",ENTRY_FIRST_CLUSTER(file_handle->entry));
+	PRINTF("\tentry: %ld\n",ENTRY_FIRST_CLUSTER(file_handle->entry));
 
 	//file_handle->dir_cluster = boot->root_cluster;
 	//PRINTF("dir_cluster: %ld should be %ld\n",file_handle->dir_cluster,boot->root_cluster);
@@ -134,13 +134,14 @@ FILE * fat32_open_file(u8 * path)
 		for(cur_sector=0;cur_sector<boot->cluster_size;cur_sector++)
 		{
 			//PRINTF("Looking for %s in sector %d (%ld)\n",cur_dir,cur_sector,file_handle->dir_cluster);
-			bfr_read(cluster_to_sector(ENTRY_FIRST_CLUSTER(file_handle->entry))+cur_sector,1,sect_buf);
+			cache_read(cluster_to_sector(ENTRY_FIRST_CLUSTER(file_handle->entry))+cur_sector,1,sect_buf);
 			entry = (fat_dir_entry *)sect_buf;
 			//loop through entries in this sector
 			//store long entries as they show up
 			//when we hit a non-long entry, check the cur_dir versus the short then possible long name
 			for(cur_entry=0;cur_entry<boot->sector_size>>5;cur_entry++)
 			{
+				PRINTF("Looking at entry %d, with name %s\n",cur_entry,entry[cur_entry].name);
 				if(entry[cur_entry].name[0]==0x00) goto not_found;
 				if(entry[cur_entry].name[0]==0xE5) continue;
 				if(entry[cur_entry].attribs!=0x0f) //normal entry
@@ -260,7 +261,7 @@ u8 * shortname(u8 * name)
 void fat32_init()
 {
 	boot = (bootsector *)malloc(sizeof(bootsector));
-	read(0,1,boot); //the rest gets zeroed with next malloc
+	cache_read(0,1,boot); //the rest gets zeroed with next malloc
 	PRINTF("root_cluster: %lu\n",boot->root_cluster);
 
 	sect_buf = (sector_buffer *)malloc(sizeof(sector_buffer));
@@ -275,6 +276,8 @@ void fat32_init()
 	sector_size_shift = 1;
 	while(1<<sector_size_shift != boot->sector_size && sector_size_shift<8)
 		sector_size_shift++;
+
+	cache_init();
 
 }
 

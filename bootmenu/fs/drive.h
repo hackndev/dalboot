@@ -1,5 +1,5 @@
-#ifndef _DRIVE_H
-#define _DRIVE_H
+#ifndef FAT_DRIVE_H
+#define FAT_DRIVE_H
 
 #include "../pxa-regs.h"
 #include "../palmld-gpio.h"
@@ -96,14 +96,13 @@ typedef struct IdentifySector {
 	u16 cmdsetext;
 	u8 padding[186];
 } __attribute__((packed)) IdentifySector;
-#endif
 
 typedef union
 {
         u8 data[512];                   /* Buffer for reading a whole sector at a time  */
         u16 data16[256];                /* 16 bit buffer version.                       */
         u32 data32[128];                /* 32 bit version. Useful for FAT entries       */
-} sector_buffer;
+} __attribute__((packed)) sector_buffer;
 
 #ifdef FAT_FUNCS
 u8 fat_strcmp(u8 * str1, u8 * str2)
@@ -139,4 +138,6 @@ void fat_memcpy(void * dst,void * src,u32 len)
 #define fat_strcmp(x,y) (u8)(strcmp( (const char*)(x), (const char*)(y)))
 #define fat_strlen(x) (u8)(strlen( (const char*)(x) ))
 #define fat_memcpy(x,y,z) memcpy(x,y,z)
+#endif
+
 #endif

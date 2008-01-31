@@ -1,4 +1,8 @@
-#include "buffer.h"
+#ifndef FAT_FAT_H
+#define FAT_FAT_H
+
+#include "cache.h"
+#include "../bootmenu.h"
 
 #define GCC_OPTION(x) __attribute__ ((x))
 #define ENTRY_FIRST_CLUSTER(x) (((u32)(x)->first_clust_hi<<16) + (x)->first_clust_lo)
@@ -94,3 +98,5 @@ typedef struct
 	u8 * path;			/* The path leading up to this file('/'='\0')	*/
 	u8 * name;			/* Points to part of path that indicates name	*/
 } GCC_OPTION(packed) FILE;
+
+#endif
