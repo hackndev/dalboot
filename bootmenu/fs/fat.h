@@ -92,11 +92,15 @@ typedef struct
 	u8 name3[4];			/* 28 Last 2 characters of name			*/
 } GCC_OPTION(packed) fat_long_name_entry;
 
-typedef struct
+struct
 {
 	fat_dir_entry * entry;		/* A copy of this file's entry			*/
 	u8 * path;			/* The path leading up to this file('/'='\0')	*/
 	u8 * name;			/* Points to part of path that indicates name	*/
+	int offset;			/* Offset (in sectors) into file		*/
+	char * base;			/* Pointer to base of buffer			*/
+	char * ptr;			/* Pointer to current position in buffer	*/
+	int count;			/* Number of bytes left in the buffer		*/
 } GCC_OPTION(packed) FILE;
 
 #endif

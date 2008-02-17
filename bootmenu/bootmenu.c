@@ -80,7 +80,9 @@ int main()
 	
 //	read_a_file("/linux.txt");
 
-	test_fat();
+	//test_fat();
+
+	parse_config("/boot.cfg");
 	
 	
 	int k;

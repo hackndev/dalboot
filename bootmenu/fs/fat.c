@@ -281,7 +281,7 @@ void fat32_init()
 
 }
 
-u32 fat32_read_file(FILE * file, u32 start, u32 length, u8 * buffer)
+u32 _fat32_read_file(FILE * file, u32 start, u32 length, u8 * buffer)
 {
 //	fat_dir_entry * root_dir;// = (fat_dir_entry *)malloc(sizeof(fat_dir_entry));
 //	u32 sector=fat_cluster_to_sector(boot->root_cluster);
@@ -472,8 +472,6 @@ void test_fs_driver()
 	//now read it...
 	u8 * buf = (u8 *)malloc(50);
 	u32 length_read;
-	length_read = fat32_read_file(file,0,50,buf);
-	length_read = fat32_read_file(file,0,50,buf);
 	length_read = fat32_read_file(file,0,50,buf);
 	PRINTF("Read from the file\n\tHow much: %ld\n\tWhat we read: %s\n",length_read,buf);
 }
