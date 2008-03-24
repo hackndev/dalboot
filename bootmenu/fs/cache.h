@@ -2,7 +2,7 @@
 #define FAT_CACHE_H
 
 #include "fat.h"
-#include "../bootmenu.h"
+#include "../main.h"
 
 #define CACHE_NUM 4
 sector_buffer cache_buffers[CACHE_NUM];

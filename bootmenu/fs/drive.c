@@ -1,4 +1,4 @@
-#include "../bootmenu.h"
+#include "../main.h"
 
 static volatile u8 *io_reg = (u8*) (PALMLD_IDE_PHYS + 0x10);
 static IdentifySector cardinfo;

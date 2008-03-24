@@ -84,6 +84,9 @@ void replace_slashes(u8 * path) //replaces all forward slashes (/) with 0x0
 	}
 }
 
+void fat32_init();
+
+
 /* Attempt #2 at opening a file
  * 
  * This one will be much smarter. 
@@ -95,6 +98,9 @@ void replace_slashes(u8 * path) //replaces all forward slashes (/) with 0x0
  */
 FILE * fat32_open_file(u8 * path)
 {
+	if(boot->filesystem_type[0]!='F' && strcmp((char *)boot->filesystem_type,"FAT32   ")) //short-circuit
+		fat32_init(); //We assume this is a fat32 sector
+
 	//Find root directory
 	u8 * name;
 
@@ -281,7 +287,7 @@ void fat32_init()
 
 }
 
-u32 _fat32_read_file(FILE * file, u32 start, u32 length, u8 * buffer)
+u32 fat32_read_file(FILE * file, u32 start, u32 length, u8 * buffer)
 {
 //	fat_dir_entry * root_dir;// = (fat_dir_entry *)malloc(sizeof(fat_dir_entry));
 //	u32 sector=fat_cluster_to_sector(boot->root_cluster);

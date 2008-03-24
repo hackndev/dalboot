@@ -1,4 +1,4 @@
-#include "bootmenu.h"
+#include "main.h"
 
 typedef struct PalmCardHeader {
 	u32 boot_branch;

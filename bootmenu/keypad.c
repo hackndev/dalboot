@@ -1,4 +1,4 @@
-#include "bootmenu.h"
+#include "main.h"
 #include "pxa-regs.h"
 
 #define DEBOUNCE_INTERVAL	32 /* ms */

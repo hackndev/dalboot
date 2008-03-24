@@ -4,15 +4,17 @@ LD=${CROSS_COMPILE}ld
 OBJCOPY=${CROSS_COMPILE}objcopy
 LDFLAGS=-nostdlib -Wall -pipe -Tbootmenu.lds
 
-SRCS=start.S bootmenu.c font.S video.c mach.c vsprintf.c string.c ctype.c \
+SRCS=start.S main.c font.S video.c mach.c vsprintf.c string.c ctype.c \
 	div64.S keypad.c palmcard.c palmld.c io-readsw-armv4.S \
-	fs/drive.c fs/fat.c fs/cache.c
+	fs/drive.c fs/fat.c fs/cache.c config.c fs/fakestdio.c \
+	bootmenu.c
 
 LIBGCC=-lgcc
 
-ASMS=start.S bootmenu.s font.S video.s mach.s vsprintf.s string.s ctype.s \
+ASMS=start.S main.s font.S video.s mach.s vsprintf.s string.s ctype.s \
 	div64.S keypad.s palmcard.s palmld.s io-readsw-armv4.S \
-	drive.s fat.s cache.s
+	drive.s fat.s cache.s config.s fakestdio.s \
+	main.s
 
 ASMLIBGCC=/usr/lib/gcc/arm-softfloat-linux-gnu/4.1.1/libgcc.a
 

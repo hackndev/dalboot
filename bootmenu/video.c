@@ -1,7 +1,7 @@
 #include <stdarg.h>
 #include "pxa-regs.h"
 #include "palmld-gpio.h"
-#include "bootmenu.h"
+#include "main.h"
 #include "vsprintf.h"
 
 extern const unsigned char fontdata_8x16[];

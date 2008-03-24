@@ -1,4 +1,4 @@
-#include "bootmenu.h"
+#include "main.h"
 #include "palmld-gpio.h"
 
 static keypad_matrix palmld_keypad = {
