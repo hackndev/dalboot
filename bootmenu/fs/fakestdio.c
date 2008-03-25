@@ -19,6 +19,41 @@ int getc(FILE * fp)
 	return c;
 }
 
+int feof(FILE * fp)
+{
+	return ((fp->offset<<sector_size_shift) + (fp->ptr-fp->base)
+                                > fp->entry->file_size)?1:0;
+}
+
+int fseek(FILE * fp, int offset, int origin)
+{
+	if(origin == SEEK_END) return -1; //un-implemented
+	if(origin == SEEK_SET)
+	{
+		if((fp->offset<<sector_size_shift) + (fp->ptr-fp->base)==offset) return 0;//seeking to same place
+		fp->offset=offset>>sector_size_shift;//offset/512, number of sectors to skip
+		fp->ptr=fp->base+(offset&TO_MOD(1<<sector_size_shift)); //offset%sector_size
+		fp->count=0;
+		return 0;
+	}
+	if(origin == SEEK_CUR)
+	{
+		fp->offset+=offset>>sector_size_shift;
+		fp->ptr+=offset&TO_MOD(1<<sector_size_shift);
+		if(fp->ptr-fp->base>=(1<<sector_size_shift))
+		{
+			fp->ptr-=1<<sector_size_shift;
+			fp->offset++;
+		}
+
+		if(offset<fp->count)
+			fp->count-=offset;
+		else
+			fp->count=0;
+		return 0;
+	}
+}
+
 int fgetc(FILE * fp)
 {
 	return (getc(fp));
