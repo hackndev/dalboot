@@ -8,7 +8,7 @@
 #define SEEK_CUR 2
 #define SEEK_END 3
 
-#define TO_MOD(a) (~(a-1))
+#define TO_MOD(a) (~((a)-1))
 
 
 int fgetc(FILE *fp);

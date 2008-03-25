@@ -52,6 +52,7 @@ int fseek(FILE * fp, int offset, int origin)
 			fp->count=0;
 		return 0;
 	}
+	return -1;
 }
 
 int fgetc(FILE * fp)
