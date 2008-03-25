@@ -1,5 +1,6 @@
 #include "palmld-gpio.h"
 #include "main.h"
+#include "bootmenu.h"
 
 
 /**
@@ -58,7 +59,7 @@ int main()
 	//test_fat();
 
 	parse_config("/boot.cfg");
-	//display_menu();
+	display_menu();
 	
 	
 	int k;
